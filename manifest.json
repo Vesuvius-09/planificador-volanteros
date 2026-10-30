@@ -1,0 +1,15 @@
+{
+  "name": "Organizador Volanteo",
+  "short_name": "Volanteo",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#2b2d42",
+  "theme_color": "#2b2d42",
+  "icons": [
+    {
+      "src": "icono.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
