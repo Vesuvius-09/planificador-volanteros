@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -17,614 +18,730 @@
       --border-radius: 20px;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      user-select: none;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  user-select: none;
+}
+
+body {
+  background-color: #2b2d42;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 0;
+}
+
+/* CONTENEDOR ADAPTABLE A LA PANTALLA DEL CELULAR */
+.app-frame {
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--bg-color);
+  border-radius: 0;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+@media (min-width: 480px) {
+  .app-frame {
+    max-width: 480px;
+    height: 100vh;
+    border-radius: 0;
+  }
+}
+
+/* CABECERA */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.header-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #000;
+}
+
+.btn-settings {
+  width: 42px;
+  height: 42px;
+  background-color: var(--accent-green);
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+}
+
+.btn-settings svg {
+  width: 24px;
+  height: 24px;
+  fill: #2d3748;
+}
+
+.btn-settings.active {
+  background-color: var(--accent-green-dark);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 2px 6px rgba(0,0,0,0.15);
+  transform: translateY(1px);
+}
+
+/* PANEL PRINCIPAL */
+.main-panel {
+  flex: 1;
+  background-color: #ffffff;
+  border-radius: var(--border-radius);
+  padding: 12px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+  position: relative;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* TABLA Y LISTADOS */
+.table-header {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr 2fr 1fr;
+  font-weight: bold;
+  font-size: 13px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #000;
+  margin-bottom: 8px;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr 2fr 1fr;
+  font-size: 13px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  align-items: center;
+}
+
+/* BARRA DE NAVEGACIÓN */
+.nav-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 4px;
+}
+
+.nav-btn {
+  width: 65px;
+  height: 50px;
+  background-color: #d8f3dc;
+  border-radius: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.nav-btn svg {
+  width: 26px;
+  height: 26px;
+  fill: #2d3748;
+}
+
+.nav-btn.active {
+  background-color: var(--accent-green-dark);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 2px 6px rgba(0,0,0,0.15);
+  transform: translateY(1px);
+}
+
+/* TARJETAS Y CONFIGURACIÓN */
+.config-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-bottom: 10px;
+}
+
+.config-card {
+  background: #f8f9fa;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  position: relative;
+}
+
+.card-header-blue {
+  background-color: var(--accent-blue);
+  padding: 8px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 15px;
+  color: #1d2d44;
+}
+
+.card-body {
+  padding: 10px 12px 40px 12px;
+  min-height: 70px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.btn-add {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  background-color: var(--accent-green);
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: bold;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* CONTENEDOR FIJO INFERIOR PARA BOTONES DE EMPLEADO */
+.emp-actions-bar {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(4px);
+  padding: 8px 4px 4px 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #e2e8f0;
+  margin-top: 10px;
+  z-index: 10;
+}
+
+.btn-add-fixed {
+  width: 44px;
+  height: 44px;
+  background-color: var(--accent-green);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: bold;
+  border: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.btn-restr-fixed {
+  height: 44px;
+  padding: 0 16px;
+  background-color: var(--accent-blue);
+  color: #1d2d44;
+  border-radius: 22px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: bold;
+  border: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.list-item {
+  padding: 6px 0;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.list-item-funcion, .emp-card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  padding: 6px 0;
+  cursor: pointer;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.btn-delete-icon {
+  color: #ef4444;
+  font-weight: bold;
+  font-size: 16px;
+  padding: 2px 6px;
+  cursor: pointer;
+}
+
+.btn-edit-icon {
+  color: #2563eb;
+  font-weight: bold;
+  font-size: 14px;
+  padding: 2px 6px;
+  cursor: pointer;
+  margin-left: 4px;
+}
+
+.emp-badge {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+  border: 1px solid rgba(0,0,0,0.2);
+}
+
+.restriction-pill {
+  background: #f1f5f9;
+  border-left: 3px solid #64748b;
+  padding: 4px 8px;
+  margin-top: 4px;
+  border-radius: 4px;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* FORMULARIOS */
+.form-group {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+.form-group label {
+  font-weight: 600;
+  flex: 1;
+}
+
+.form-group input, .form-group select {
+  flex: 1.5;
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 13px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.btn-action {
+  flex: 1;
+  padding: 10px;
+  border-radius: 12px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.btn-cancel { background-color: #cbd5e1; }
+.btn-save { background-color: var(--accent-green-dark); color: white; }
+.btn-delete { background-color: var(--accent-red); color: #721c24; }
+
+/* ESTILOS DE CALENDARIO DE SELECCIÓN MÚLTIPLE */
+.calendar-container {
+  margin-top: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+  text-align: center;
+}
+
+.cal-day-label {
+  font-size: 11px;
+  font-weight: bold;
+  color: #3b82f6;
+  padding-bottom: 4px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.cal-day-label:hover {
+  background-color: #e2e8f0;
+}
+
+.cal-day-cell {
+  padding: 6px 0;
+  font-size: 11px;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  cursor: pointer;
+}
+
+.cal-day-cell.today-cell {
+  border: 2px dashed #2563eb !important;
+}
+
+.cal-day-cell.selected {
+  border: 2px solid #1d4ed8 !important;
+  font-weight: bold;
+}
+
+.cal-day-cell.plan-incomplete {
+  background-color: #ffadad !important;
+  border-color: #f87171;
+  color: #7f1d1d;
+  font-weight: bold;
+}
+
+.cal-day-cell.plan-complete {
+  background-color: #b7e4c7 !important;
+  border-color: #4ade80;
+  color: #14532d;
+  font-weight: bold;
+}
+
+.cal-day-cell.empty {
+  background: transparent;
+  border: none;
+  cursor: default;
+}
+
+.cal-shortcuts {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.cal-btn-mini {
+  flex: 1;
+  font-size: 10px;
+  padding: 4px;
+  background: #e2e8f0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* ESTILOS MATRICIALES TIPO EXCEL */
+.matrix-wrapper {
+  overflow-x: auto;
+  max-width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  margin-top: 8px;
+}
+
+.matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: center;
+}
+
+.matrix-table th, .matrix-table td {
+  border: 1px solid #e2e8f0;
+  padding: 5px 4px;
+  white-space: nowrap;
+}
+
+.matrix-table th {
+  background-color: #f1f5f9;
+  font-weight: 700;
+  color: #334155;
+}
+
+.matrix-table td.emp-name-cell {
+  text-align: left;
+  font-weight: 700;
+  padding-left: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2px;
+}
+
+.matrix-table td.emp-name-cell select {
+  flex: 1;
+  padding: 3px;
+  border-radius: 4px;
+  border: 1px solid #cbd5e1;
+  font-size: 11px;
+  background: #fff;
+}
+
+.matrix-cell-btn {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  border-radius: 4px;
+  user-select: none;
+  margin: auto;
+}
+
+.matrix-ok-row {
+  font-weight: bold;
+  background-color: #f8fafc;
+}
+
+.matrix-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #e2e8f0;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.matrix-btn-group {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.mini-chip-btn {
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.plan-day-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 10px;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  border: 1px solid #e2e8f0;
+  position: relative;
+}
+
+.plan-day-header-info {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 25px;
+}
+
+.card-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  color: #94a3b8;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  line-height: 1;
+}
+.card-close-btn:hover {
+  color: #ef4444;
+}
+
+/* ESTILOS MODAL DE EXPORTACIÓN */
+.export-overlay { position:fixed; inset:0; background:rgba(15,23,42,.65); backdrop-filter: blur(4px); z-index:10000; display:flex; align-items:center; justify-content:center; padding:18px; }
+.export-modal { width:min(100%,380px); background:#ffffff; border-radius:24px; padding:24px; box-shadow:0 20px 40px rgba(0,0,0,.25); color:#1d2d44; animation: modalPop .2s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes modalPop { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.export-modal h3 { margin-bottom:16px; font-size:20px; font-weight:800; color:#0f172a; letter-spacing:-0.5px; }
+.export-field { margin:14px 0; display:flex; flex-direction:column; gap:6px; font-size:13px; font-weight:700; color:#334155; }
+.export-field select { width:100%; padding:11px 14px; border:1px solid #cbd5e1; border-radius:12px; background:#f8fafc; font-size:14px; color:#1e293b; font-weight:600; outline:none; transition:border-color .2s; }
+.export-field select:focus { border-color:#2563eb; background:#fff; }
+.export-actions { display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:22px; }
+.export-actions button { border:0; border-radius:12px; padding:12px; font-weight:700; cursor:pointer; font-size:14px; transition:filter .2s; }
+.export-actions button:hover { filter: brightness(0.95); }
+.btn-export-cancel { background:#f1f5f9; color:#475569; }
+.btn-export-main { background:#2563eb; color:white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+
+/* ESTILOS SECCIÓN DESCARGAS/EXPORTAR */
+.export-panel-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 10px 4px;
+}
+.export-card-option {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.export-card-option h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.export-card-option p {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.4;
+}
+.btn-big-action {
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+.btn-big-action.green {
+  background: #10b981;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+.btn-big-action.red {
+  background: #ef4444;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+
+    /* DISTRIBUCIÓN RESPONSIVE: CABECERA Y MENÚ FIJOS, SCROLL SOLO EN EL PANEL */
+    html {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
     }
 
     body {
-      background-color: #2b2d42;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 0;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      margin: 0;
+      overflow: hidden;
+      overscroll-behavior: none;
     }
 
-    /* CONTENEDOR ADAPTABLE A LA PANTALLA DEL CELULAR */
     .app-frame {
-      width: 100vw;
-      height: 100vh;
-      background-color: var(--bg-color);
-      border-radius: 0;
-      box-shadow: none;
+      width: 100%;
+      height: 100vh;       /* respaldo para navegadores antiguos */
+      height: 100dvh;      /* se adapta a las barras dinámicas del celular */
+      min-height: 0;
+      max-height: 100dvh;
+      box-sizing: border-box;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      padding: 16px 12px;
-      position: relative;
+      justify-content: flex-start;
       overflow: hidden;
+      padding-top: max(12px, env(safe-area-inset-top));
+      padding-right: max(12px, env(safe-area-inset-right));
+      padding-bottom: max(10px, env(safe-area-inset-bottom));
+      padding-left: max(12px, env(safe-area-inset-left));
+      gap: 10px;
+    }
+
+    .header {
+      flex: 0 0 auto;
+      width: 100%;
+      margin: 0;
+      min-height: 42px;
+    }
+
+    .header-title {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .main-panel {
+      flex: 1 1 auto;
+      min-height: 0;
+      height: 0;
+      width: 100%;
+      margin: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+      scrollbar-gutter: stable;
+    }
+
+    .nav-bar {
+      flex: 0 0 auto;
+      width: 100%;
+      min-height: 50px;
+      padding-bottom: 0;
+      margin: 0;
+      background: var(--bg-color);
+      position: relative;
+      z-index: 20;
+    }
+
+    @media (max-height: 600px) {
+      .app-frame { gap: 6px; padding-top: max(6px, env(safe-area-inset-top)); padding-bottom: max(6px, env(safe-area-inset-bottom)); }
+      .header { margin-bottom: 0; }
+      .header-title { font-size: 19px; }
+      .nav-btn { height: 42px; }
     }
 
     @media (min-width: 480px) {
       .app-frame {
+        width: 100%;
         max-width: 480px;
         height: 100vh;
-        border-radius: 0;
+        height: 100dvh;
+        max-height: 100dvh;
       }
     }
 
-    /* CABECERA */
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-
-    .header-title {
-      font-size: 22px;
-      font-weight: 800;
-      color: #000;
-    }
-
-    .btn-settings {
-      width: 42px;
-      height: 42px;
-      background-color: var(--accent-green);
-      border-radius: 12px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      border: none;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    .btn-settings svg {
-      width: 24px;
-      height: 24px;
-      fill: #2d3748;
-    }
-
-    /* PANEL PRINCIPAL */
-    .main-panel {
-      flex: 1;
-      background-color: #ffffff;
-      border-radius: var(--border-radius);
-      padding: 12px;
-      overflow-y: auto;
-      margin-bottom: 12px;
-      position: relative;
-      box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
-    }
-
-    /* TABLA Y LISTADOS */
-    .table-header {
-      display: grid;
-      grid-template-columns: 1fr 1.2fr 1fr 2fr 1fr;
-      font-weight: bold;
-      font-size: 13px;
-      padding-bottom: 6px;
-      border-bottom: 2px solid #000;
-      margin-bottom: 8px;
-    }
-
-    .table-row {
-      display: grid;
-      grid-template-columns: 1fr 1.2fr 1fr 2fr 1fr;
-      font-size: 13px;
-      padding: 6px 0;
-      border-bottom: 1px solid rgba(0,0,0,0.05);
-      align-items: center;
-    }
-
-    /* BARRA DE NAVEGACIÓN */
-    .nav-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 4px;
-    }
-
-    .nav-btn {
-      width: 65px;
-      height: 50px;
-      background-color: #d8f3dc;
-      border-radius: 16px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      border: none;
-      transition: all 0.2s ease;
-    }
-
-    .nav-btn svg {
-      width: 26px;
-      height: 26px;
-      fill: #2d3748;
-    }
-
-    .nav-btn.active {
-      background-color: var(--accent-green-dark);
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 2px 6px rgba(0,0,0,0.15);
-      transform: translateY(1px);
-    }
-
-    /* TARJETAS Y CONFIGURACIÓN */
-    .config-container {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      padding-bottom: 50px;
-    }
-
-    .config-card {
-      background: #f8f9fa;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      position: relative;
-    }
-
-    .card-header-blue {
-      background-color: var(--accent-blue);
-      padding: 8px;
-      text-align: center;
-      font-weight: 600;
-      font-size: 15px;
-      color: #1d2d44;
-    }
-
-    .card-body {
-      padding: 10px 12px 40px 12px;
-      min-height: 70px;
-      max-height: 180px;
-      overflow-y: auto;
-    }
-
-    .btn-add {
-      position: absolute;
-      bottom: 8px;
-      right: 8px;
-      width: 32px;
-      height: 32px;
-      background-color: var(--accent-green);
-      border-radius: 10px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      font-size: 20px;
-      font-weight: bold;
-      border: none;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .btn-add-floating {
-      position: absolute;
-      bottom: 12px;
-      right: 12px;
-      width: 44px;
-      height: 44px;
-      background-color: var(--accent-green);
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      font-size: 24px;
-      font-weight: bold;
-      border: none;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-
-    .btn-restr-floating {
-      position: absolute;
-      bottom: 12px;
-      left: 12px;
-      height: 44px;
-      padding: 0 14px;
-      background-color: var(--accent-blue);
-      color: #1d2d44;
-      border-radius: 22px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: bold;
-      border: none;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-
-    .list-item {
-      padding: 6px 0;
-      font-size: 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px dashed #e2e8f0;
-    }
-
-    .list-item-funcion, .emp-card-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 14px;
-      padding: 6px 0;
-      cursor: pointer;
-      border-bottom: 1px dashed #e2e8f0;
-    }
-
-    .btn-delete-icon {
-      color: #ef4444;
-      font-weight: bold;
-      font-size: 16px;
-      padding: 2px 6px;
-      cursor: pointer;
-    }
-
-    .emp-badge {
-      display: inline-block;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      margin-right: 6px;
-      vertical-align: middle;
-      border: 1px solid rgba(0,0,0,0.2);
-    }
-
-    .restriction-pill {
-      background: #f1f5f9;
-      border-left: 3px solid #64748b;
-      padding: 4px 8px;
-      margin-top: 4px;
-      border-radius: 4px;
-      font-size: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    /* FORMULARIOS */
-    .form-group {
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 14px;
-    }
-
-    .form-group label {
-      font-weight: 600;
-      flex: 1;
-    }
-
-    .form-group input, .form-group select {
-      flex: 1.5;
-      padding: 5px 8px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 13px;
-    }
-
-    .form-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 15px;
-    }
-
-    .btn-action {
-      flex: 1;
-      padding: 10px;
-      border-radius: 12px;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 13px;
-    }
-
-    .btn-cancel { background-color: #cbd5e1; }
-    .btn-save { background-color: var(--accent-green-dark); color: white; }
-    .btn-delete { background-color: var(--accent-red); color: #721c24; }
-
-    /* ESTILOS DE CALENDARIO DE SELECCIÓN MÚLTIPLE */
-    .calendar-container {
-      margin-top: 8px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      padding: 8px;
-    }
-
-    .calendar-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-weight: bold;
-      font-size: 13px;
-      margin-bottom: 6px;
-    }
-
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 3px;
-      text-align: center;
-    }
-
-    .cal-day-label {
-      font-size: 11px;
-      font-weight: bold;
-      color: #3b82f6;
-      padding-bottom: 4px;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-
-    .cal-day-label:hover {
-      background-color: #e2e8f0;
-    }
-
-    .cal-day-cell {
-      padding: 6px 0;
-      font-size: 11px;
-      border-radius: 6px;
-      background: #fff;
-      border: 1px solid #cbd5e1;
-      cursor: pointer;
-    }
-
-    .cal-day-cell.today-cell {
-      border: 2px dashed #2563eb !important;
-    }
-
-    .cal-day-cell.selected {
-      border: 2px solid #1d4ed8 !important;
-      font-weight: bold;
-    }
-
-    .cal-day-cell.plan-incomplete {
-      background-color: #ffadad !important;
-      border-color: #f87171;
-      color: #7f1d1d;
-      font-weight: bold;
-    }
-
-    .cal-day-cell.plan-complete {
-      background-color: #b7e4c7 !important;
-      border-color: #4ade80;
-      color: #14532d;
-      font-weight: bold;
-    }
-
-    .cal-day-cell.empty {
-      background: transparent;
-      border: none;
-      cursor: default;
-    }
-
-    .cal-shortcuts {
-      display: flex;
-      gap: 4px;
-      margin-top: 6px;
-    }
-
-    .cal-btn-mini {
-      flex: 1;
-      font-size: 10px;
-      padding: 4px;
-      background: #e2e8f0;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    /* ESTILOS MATRICIALES TIPO EXCEL */
-    .matrix-wrapper {
-      overflow-x: auto;
-      max-width: 100%;
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      background: #fff;
-      margin-top: 8px;
-    }
-
-    .matrix-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12px;
-      text-align: center;
-    }
-
-    .matrix-table th, .matrix-table td {
-      border: 1px solid #e2e8f0;
-      padding: 5px 4px;
-      white-space: nowrap;
-    }
-
-    .matrix-table th {
-      background-color: #f1f5f9;
-      font-weight: 700;
-      color: #334155;
-    }
-
-    .matrix-table td.emp-name-cell {
-      text-align: left;
-      font-weight: 700;
-      padding-left: 4px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 2px;
-    }
-
-    .matrix-table td.emp-name-cell select {
-      flex: 1;
-      padding: 3px;
-      border-radius: 4px;
-      border: 1px solid #cbd5e1;
-      font-size: 11px;
-      background: #fff;
-    }
-
-    .matrix-cell-btn {
-      width: 24px;
-      height: 24px;
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      font-weight: bold;
-      font-size: 14px;
-      border-radius: 4px;
-      user-select: none;
-      margin: auto;
-    }
-
-    .matrix-ok-row {
-      font-weight: bold;
-      background-color: #f8fafc;
-    }
-
-    .matrix-toolbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #e2e8f0;
-      padding: 6px 10px;
-      border-radius: 8px;
-      font-size: 12px;
-      margin-bottom: 8px;
-      font-weight: 600;
-    }
-
-    .matrix-btn-group {
-      display: flex;
-      gap: 4px;
-      align-items: center;
-    }
-
-    .mini-chip-btn {
-      background: #fff;
-      border: 1px solid #cbd5e1;
-      border-radius: 4px;
-      padding: 2px 6px;
-      font-size: 11px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .plan-day-card {
-      background: #fff;
-      border-radius: 12px;
-      padding: 10px;
-      margin-bottom: 14px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-      border: 1px solid #e2e8f0;
-      position: relative;
-    }
-
-    .plan-day-header-info {
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      padding: 6px 10px;
-      font-weight: 700;
-      font-size: 13px;
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-right: 25px;
-    }
-
-    .card-close-btn {
-      position: absolute;
-      top: 12px;
-      right: 14px;
-      color: #94a3b8;
-      font-weight: bold;
-      font-size: 16px;
-      cursor: pointer;
-      line-height: 1;
-    }
-    .card-close-btn:hover {
-      color: #ef4444;
-    }
-
-    /* ESTILOS MODAL DE EXPORTACIÓN */
-    .export-overlay { position:fixed; inset:0; background:rgba(15,23,42,.65); backdrop-filter: blur(4px); z-index:10000; display:flex; align-items:center; justify-content:center; padding:18px; }
-    .export-modal { width:min(100%,380px); background:#ffffff; border-radius:24px; padding:24px; box-shadow:0 20px 40px rgba(0,0,0,.25); color:#1d2d44; animation: modalPop .2s cubic-bezier(0.16, 1, 0.3, 1); }
-    @keyframes modalPop { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-    .export-modal h3 { margin-bottom:16px; font-size:20px; font-weight:800; color:#0f172a; letter-spacing:-0.5px; }
-    .export-field { margin:14px 0; display:flex; flex-direction:column; gap:6px; font-size:13px; font-weight:700; color:#334155; }
-    .export-field select { width:100%; padding:11px 14px; border:1px solid #cbd5e1; border-radius:12px; background:#f8fafc; font-size:14px; color:#1e293b; font-weight:600; outline:none; transition:border-color .2s; }
-    .export-field select:focus { border-color:#2563eb; background:#fff; }
-    .export-actions { display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:22px; }
-    .export-actions button { border:0; border-radius:12px; padding:12px; font-weight:700; cursor:pointer; font-size:14px; transition:filter .2s; }
-    .export-actions button:hover { filter: brightness(0.95); }
-    .btn-export-cancel { background:#f1f5f9; color:#475569; }
-    .btn-export-main { background:#2563eb; color:white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
-
-    /* ESTILOS SECCIÓN DESCARGAS/EXPORTAR (Pestaña 3) */
-    .export-panel-container {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      padding: 10px 4px;
-    }
-    .export-card-option {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 16px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .export-card-option h4 {
-      font-size: 16px;
-      font-weight: 700;
-      color: #0f172a;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .export-card-option p {
-      font-size: 13px;
-      color: #64748b;
-      line-height: 1.4;
-    }
-    .btn-big-action {
-      background: #2563eb;
-      color: white;
-      border: none;
-      border-radius: 12px;
-      padding: 12px;
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-      margin-top: 6px;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-    }
-    .btn-big-action.green {
-      background: #10b981;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
-    }
-    .btn-big-action.red {
-      background: #ef4444;
-      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
-    }
   </style>
 </head>
 <body>
@@ -632,50 +749,30 @@
   <div class="app-frame">
     <!-- CABECERA -->
     <div class="header">
-      <div class="header-title" id="menu-title">Descargas</div>
-      <button class="btn-settings" onclick="openConfig()">
-        <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-.3.06-.61.06-.94c0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24,0-.43.17-.47.41l-.36,2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47,0-.59.22L2.74,8.87c-.12.21-.08.47.12.61l2.03,1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03,1.58c-.18.14-.23.41-.12.61l1.92,3.32c.12.22.37.29.59.22l2.39-.96c.5.38,1.03.7,1.62.94l.36,2.54c.05.24.24.41.48.41h3.84c-.24,0,.44-.17.47-.41l.36-2.54c.59-.24,1.13-.56,1.62-.94l2.39.96c.22.08.47,0,.59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-.16zM12,15.6c-1.98,0-3.6-1.62-3.6-3.6s1.62-3.6,3.6-3.6,3.6,1.62,3.6,3.6-1.62,3.6-3.6,3.6z"></path></svg>
-      </button>
-    </div>
-
-    <!-- PANEL PRINCIPAL CONTENEDOR -->
-    <div class="main-panel" id="content-panel">
-        <div class="export-panel-container">
-          <div class="export-card-option">
-            <h4>📲 Descargar Aplicación Completa</h4>
-            <p>Descargá este archivo HTML actualizado con todas tus funciones, empleados y planificaciones guardadas para compartirlo o usarlo sin conexión.</p>
-            <button class="btn-big-action green" onclick="downloadFullAppHTML()">Descargar app (.html)</button>
-          </div>
-
-          <div class="export-card-option">
-            <h4>🧹 Mantenimiento</h4>
-            <p>Eliminá automáticamente de la base de datos todas las fechas de funciones pasadas hasta la fecha actual.</p>
-            <button class="btn-big-action red" onclick="cleanPastFunctions(true)">Eliminar funciones pasadas</button>
-          </div>
-
-          <div class="export-card-option">
-            <h4>📊 Exportar Planificaciones</h4>
-            <p>Seleccioná fechas en la pestaña de Calendario y utilizá el botón de descarga rápida para obtener reportes en texto o imágenes matriciales idénticas a tu formato.</p>
-            <button class="btn-big-action" onclick="switchTab(1)">Ir a Calendario</button>
-          </div>
-        </div>
-      </div>
-
-    <!-- BARRA DE NAVEGACIÓN INFERIOR -->
-    <div class="nav-bar">
-      <button class="nav-btn" id="nav-0" onclick="switchTab(0)">
-        <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"></path></svg>
-      </button>
-      <button class="nav-btn" id="nav-1" onclick="switchTab(1)">
-        <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"></path></svg>
-      </button>
-      <button class="nav-btn" id="nav-2" onclick="switchTab(2)">
-        <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"></path></svg>
-      </button>
-      <button class="nav-btn active" id="nav-3" onclick="switchTab(3)">
+      <div class="header-title" id="menu-title">Próximas funciones</div>
+      <button class="btn-settings" id="top-download-btn" onclick="openDownloadsTab()" title="Descargas">
         <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path></svg>
       </button>
     </div>
+
+<!-- PANEL PRINCIPAL CONTENEDOR -->
+<div class="main-panel" id="content-panel"></div>
+
+<!-- BARRA DE NAVEGACIÓN INFERIOR -->
+<div class="nav-bar">
+  <button class="nav-btn active" id="nav-0" onclick="switchTab(0)">
+    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"></path></svg>
+  </button>
+  <button class="nav-btn" id="nav-1" onclick="switchTab(1)">
+    <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"></path></svg>
+  </button>
+  <button class="nav-btn" id="nav-2" onclick="switchTab(2)">
+    <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"></path></svg>
+  </button>
+  <button class="nav-btn" id="nav-3" onclick="switchTab(3)">
+    <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-.3.06-.61.06-.94c0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24,0-.43.17-.47.41l-.36,2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47,0-.59.22L2.74,8.87c-.12.21-.08.47.12.61l2.03,1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03,1.58c-.18.14-.23.41-.12.61l1.92,3.32c.12.22.37.29.59.22l2.39-.96c.5.38,1.03.7,1.62.94l.36,2.54c.05.24.24.41.48.41h3.84c-.24,0,.44-.17.47-.41l.36-2.54c.59-.24,1.13-.56,1.62-.94l2.39.96c.22.08.47,0,.59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-.16zM12,15.6c-1.98,0-3.6-1.62-3.6-3.6s1.62-3.6,3.6-3.6,3.6,1.62,3.6,3.6-1.62,3.6-3.6,3.6z"></path></svg>
+  </button>
+</div>
   </div>
 
   <script>
@@ -691,11 +788,14 @@
       planificaciones: {}
     };
 
+
     let currentTab = 0;
+    let isDownloadsActive = false;
     let selectedCalendarDates = [];
     let calViewDate = new Date();
     let planSelectedDates = [];
     let planCalViewDate = new Date();
+
 
     function init() {
       const saved = localStorage.getItem('volanteo_db');
@@ -706,27 +806,54 @@
         db.planificaciones = {};
       }
       cleanPastFunctions(false);
+      ensureUpcomingDefaults();
       renderCurrentTab();
     }
+
 
     function getTodayKeyStr() {
       const today = new Date();
       return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     }
 
+
+    function ensureUpcomingDefaults() {
+      if (!db.funciones || db.funciones.length === 0) {
+        const todayKey = getTodayKeyStr();
+        db.funciones = [
+          {
+            id: 1,
+            fechas: [todayKey],
+            hora: "20:00",
+            show: db.shows[0] || "Parejas",
+            sala: db.salas[0] || "Cortazar",
+            volanteros: 3,
+            volanteoDesde: "19:45",
+            volanteoHasta: "21:30",
+            exclusivo: false
+          }
+        ];
+        saveDB();
+      }
+    }
+
+
     function cleanPastFunctions(userInitiated = false) {
       const todayStr = getTodayKeyStr();
       let removedCount = 0;
 
-      db.funciones.forEach(fn => {
-        if (Array.isArray(fn.fechas)) {
-          const originalLength = fn.fechas.length;
-          fn.fechas = fn.fechas.filter(fStr => fStr >= todayStr);
-          removedCount += (originalLength - fn.fechas.length);
-        }
-      });
 
-      db.funciones = db.funciones.filter(fn => fn.fechas && fn.fechas.length > 0);
+      if (Array.isArray(db.funciones)) {
+        db.funciones.forEach(fn => {
+          if (Array.isArray(fn.fechas)) {
+            const originalLength = fn.fechas.length;
+            fn.fechas = fn.fechas.filter(fStr => fStr >= todayStr);
+            removedCount += (originalLength - fn.fechas.length);
+          }
+        });
+        db.funciones = db.funciones.filter(fn => fn.fechas && fn.fechas.length > 0);
+      }
+
 
       Object.keys(db.planificaciones).forEach(planKey => {
         const datePart = planKey.split('_')[0];
@@ -735,19 +862,26 @@
         }
       });
 
+
       saveDB();
+
 
       if (userInitiated) {
         alert(removedCount > 0 ? `Se eliminaron las fechas anteriores a hoy.` : 'No había funciones o fechas pasadas para eliminar.');
+        ensureUpcomingDefaults();
         renderCurrentTab();
       }
     }
+
 
     function saveDB() {
       localStorage.setItem('volanteo_db', JSON.stringify(db));
     }
 
+
     function switchTab(idx) {
+      isDownloadsActive = false;
+      document.getElementById('top-download-btn').classList.remove('active');
       currentTab = idx;
       document.querySelectorAll('.nav-btn').forEach((btn, i) => {
         btn.classList.toggle('active', i === idx);
@@ -755,22 +889,32 @@
       renderCurrentTab();
     }
 
-    function openConfig() {
-      document.getElementById('menu-title').innerText = "Configuración";
+
+    function openDownloadsTab() {
+      isDownloadsActive = true;
+      document.getElementById('top-download-btn').classList.add('active');
+      document.getElementById('menu-title').innerText = "Descargas";
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-      renderConfigMenu();
+      renderDownloadsTab(document.getElementById('content-panel'));
     }
 
+
     function renderCurrentTab() {
-      const titles = ["Próximas funciones", "Calendario", "Empleados", "Descargas"];
+      if (isDownloadsActive) {
+        openDownloadsTab();
+        return;
+      }
+      const titles = ["Próximas funciones", "Calendario", "Empleados", "Configuración"];
       document.getElementById('menu-title').innerText = titles[currentTab];
+
 
       const panel = document.getElementById('content-panel');
       if (currentTab === 0) renderHome(panel);
       else if (currentTab === 1) renderPlanning(panel);
       else if (currentTab === 2) renderEmployees(panel);
-      else if (currentTab === 3) renderDownloadsTab(panel);
+      else if (currentTab === 3) renderConfigMenu();
     }
+
 
     function getFunctionMinAssigned(fn, dateKeyStr, salaName) {
       const start = minutesFromTime(fn.volanteoDesde) ?? minutesFromTime(fn.hora) - 15;
@@ -778,28 +922,29 @@
       if (end === null) end = minutesFromTime(fn.hora) + 120;
       if (end <= start) end += 1440;
 
+
       const planKey = `${dateKeyStr}_${salaName}`;
       const plan = db.planificaciones[planKey];
       if (!plan || !plan.filas || !plan.filas.length) return 0;
 
-      let minCount = Infinity;
+
+      let assignedSet = new Set();
+
 
       for (let t = start; t <= end; t += 15) {
-        let count = 0;
         plan.filas.forEach(row => {
           if (row.empleadoId && row.slots && row.slots[String(t)] === 'checked') {
             if (!employeeHasRestriction(row.empleadoId, dateKeyStr, t)) {
-              count++;
+              assignedSet.add(row.empleadoId);
             }
           }
         });
-        if (count < minCount) {
-          minCount = count;
-        }
       }
 
-      return minCount === Infinity ? 0 : minCount;
+
+      return assignedSet.size;
     }
+
 
     function renderHome(container) {
       const occurrences = generateFunctionDates();
@@ -812,6 +957,7 @@
           <div>Ok</div>
         </div>
       `;
+
 
       if (occurrences.length === 0) {
         html += `<div style="text-align:center; padding: 20px; font-size:14px; color:#64748b;">No hay funciones programadas</div>`;
@@ -832,6 +978,7 @@
       container.innerHTML = html;
     }
 
+
     function generateFunctionDates() {
       const list = [];
       db.funciones.forEach(fn => {
@@ -845,6 +992,7 @@
             if (sortMinutes !== null && sortMinutes >= 0 && sortMinutes <= 120) {
               sortMinutes += 1440;
             }
+
 
             list.push({
               diaStr: `${dayNum}/${monthNum}`,
@@ -870,6 +1018,7 @@
       return list;
     }
 
+
     function renderConfigMenu() {
       const panel = document.getElementById('content-panel');
       let html = `
@@ -878,6 +1027,7 @@
             <div class="card-header-blue">Funciones</div>
             <div class="card-body">
       `;
+
 
       db.funciones.forEach((fn, index) => {
         const count = fn.fechas ? fn.fechas.length : 0;
@@ -890,15 +1040,18 @@
         `;
       });
 
+
       html += `
             </div>
             <button class="btn-add" onclick="openAddFuncion()">+</button>
           </div>
 
+
           <div class="config-card">
             <div class="card-header-blue">Shows</div>
             <div class="card-body">
       `;
+
 
       db.shows.forEach((show, idx) => {
         html += `
@@ -909,15 +1062,18 @@
         `;
       });
 
+
       html += `
             </div>
             <button class="btn-add" onclick="openAddShow()">+</button>
           </div>
 
+
           <div class="config-card">
             <div class="card-header-blue">Salas</div>
             <div class="card-body">
       `;
+
 
       db.salas.forEach((sala, idx) => {
         html += `
@@ -928,6 +1084,7 @@
         `;
       });
 
+
       html += `
             </div>
             <button class="btn-add" onclick="openAddSala()">+</button>
@@ -935,64 +1092,79 @@
         </div>
       `;
 
+
       panel.innerHTML = html;
     }
+
 
     function openAddFuncion(editIndex = null) {
       const panel = document.getElementById('content-panel');
       document.getElementById('menu-title').innerText = editIndex !== null ? "Editar Función" : "Nueva Función";
+
 
       const fn = editIndex !== null ? db.funciones[editIndex] : {
         fechas: [], hora: "21:30", show: db.shows[0] || "", sala: db.salas[0] || "",
         volanteros: 3, volanteoDesde: "19:30", volanteoHasta: "21:30", exclusivo: false
       };
 
+
       selectedCalendarDates = fn.fechas ? [...fn.fechas] : [];
       calViewDate = new Date();
 
+
       let showsOptions = db.shows.map(s => `<option value="${s}" ${s === fn.show ? 'selected' : ''}>${s}</option>`).join('');
       let salasOptions = db.salas.map(s => `<option value="${s}" ${s === fn.sala ? 'selected' : ''}>${s}</option>`).join('');
+
 
       panel.innerHTML = `
         <div class="config-card" style="padding: 12px; background:#fff;">
           <div class="card-header-blue" style="margin: -12px -12px 12px -12px;">Detalles de la Función</div>
 
+
           <div class="form-group"><label>Show:</label><select id="fn_show">${showsOptions}</select></div>
           <div class="form-group"><label>Sala:</label><select id="fn_sala">${salasOptions}</select></div>
-          <div class="form-group"><label>Hora Función:</label><input type="time" id="fn_hora" value="${fn.hora}"></div>
+          <div class="form-group"><label>Hora Función:</label><input type="time" lang="en-GB" id="fn_hora" value="${fn.hora}"></div>
+
 
           <div style="font-weight:bold; font-size:12px; margin-top:10px;">Selecciona los días en el calendario:</div>
           <div style="font-size:10px; color:#64748b; margin-bottom:4px;">Tip: Toca las letras arriba (L, M, X...) para marcar/desmarcar todos esos días del mes.</div>
           <div class="calendar-container" id="calendar_render"></div>
 
+
           <div class="form-group" style="margin-top:10px;"><label>Volanteros:</label><input type="number" id="fn_volanteros" value="${fn.volanteros}" style="text-align:center; font-weight:bold;"></div>
-          <div class="form-group"><label>Volanteo desde:</label><input type="time" id="fn_v_desde" value="${fn.volanteoDesde}"></div>
-          <div class="form-group"><label>Volanteo hasta:</label><input type="time" id="fn_v_hasta" value="${fn.volanteoHasta}"></div>
+          <div class="form-group"><label>Volanteo desde:</label><input type="time" lang="en-GB" id="fn_v_desde" value="${fn.volanteoDesde}"></div>
+          <div class="form-group"><label>Volanteo hasta:</label><input type="time" lang="en-GB" id="fn_v_hasta" value="${fn.volanteoHasta}"></div>
           <div class="form-group"><label>Exclusivo:</label><input type="checkbox" id="fn_exclusivo" ${fn.exclusivo ? 'checked' : ''} style="width:20px; height:20px;"></div>
         </div>
 
+
         <div class="form-actions">
-          <button class="btn-action btn-cancel" onclick="openConfig()">Cancelar</button>
+          <button class="btn-action btn-cancel" onclick="switchTab(3)">Cancelar</button>
           ${editIndex !== null ? `<button class="btn-action btn-delete" onclick="deleteFuncion(${editIndex})">Eliminar</button>` : ''}
           <button class="btn-action btn-save" onclick="saveFuncion(${editIndex})">Guardar</button>
         </div>
       `;
 
+
       renderFuncionCalendar();
     }
+
 
     function renderFuncionCalendar() {
       const container = document.getElementById('calendar_render');
       if (!container) return;
 
+
       const year = calViewDate.getFullYear();
       const month = calViewDate.getMonth();
       const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
 
       const firstDay = new Date(year, month, 1).getDay();
       const daysInMonth = new Date(year, month + 1, 0).getDate();
       let startOffset = firstDay === 0 ? 6 : firstDay - 1;
       const todayKey = getTodayKeyStr();
+
 
       let html = `
         <div class="calendar-header">
@@ -1010,14 +1182,17 @@
           <div class="cal-day-label" onclick="toggleAllWeekdaysInMonth(0, ${year}, ${month})">D</div>
       `;
 
+
       for (let i = 0; i < startOffset; i++) {
         html += `<div class="cal-day-cell empty"></div>`;
       }
+
 
       for (let d = 1; d <= daysInMonth; d++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         const isSelected = selectedCalendarDates.includes(dateStr);
         const isToday = dateStr === todayKey;
+
 
         html += `
           <div class="cal-day-cell ${isSelected ? 'selected' : ''} ${isToday ? 'today-cell' : ''}" onclick="toggleCalendarDate('${dateStr}')">
@@ -1026,9 +1201,11 @@
         `;
       }
 
+
       html += `</div>`;
       container.innerHTML = html;
     }
+
 
     function toggleAllWeekdaysInMonth(targetDayIndex, year, month) {
       const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -1041,6 +1218,7 @@
         }
       }
 
+
       const allSelected = monthDates.every(d => selectedCalendarDates.includes(d));
       if (allSelected) {
         selectedCalendarDates = selectedCalendarDates.filter(d => !monthDates.includes(d));
@@ -1052,10 +1230,12 @@
       renderFuncionCalendar();
     }
 
+
     function changeCalMonth(delta) {
       calViewDate.setMonth(calViewDate.getMonth() + delta);
       renderFuncionCalendar();
     }
+
 
     function toggleCalendarDate(dateStr) {
       const idx = selectedCalendarDates.indexOf(dateStr);
@@ -1064,11 +1244,13 @@
       renderFuncionCalendar();
     }
 
+
     function saveFuncion(editIndex) {
       if (selectedCalendarDates.length === 0) {
         alert("Por favor selecciona al menos un día en el calendario.");
         return;
       }
+
 
       const newFn = {
         id: editIndex !== null ? db.funciones[editIndex].id : Date.now(),
@@ -1082,20 +1264,24 @@
         exclusivo: document.getElementById('fn_exclusivo').checked
       };
 
+
       if (editIndex !== null) db.funciones[editIndex] = newFn;
       else db.funciones.push(newFn);
 
+
       saveDB();
-      openConfig();
+      switchTab(3);
     }
+
 
     function deleteFuncion(index) {
       if (confirm("¿Eliminar esta función?")) {
         db.funciones.splice(index, 1);
         saveDB();
-        openConfig();
+        switchTab(3);
       }
     }
+
 
     function openAddShow(editIndex = null) {
       const val = editIndex !== null ? db.shows[editIndex] : '';
@@ -1104,17 +1290,19 @@
         if (editIndex !== null) db.shows[editIndex] = name.trim();
         else db.shows.push(name.trim());
         saveDB();
-        openConfig();
+        switchTab(3);
       }
     }
+
 
     function deleteShow(index) {
       if (confirm(`¿Eliminar el show "${db.shows[index]}"?`)) {
         db.shows.splice(index, 1);
         saveDB();
-        openConfig();
+        switchTab(3);
       }
     }
+
 
     function openAddSala(editIndex = null) {
       const val = editIndex !== null ? db.salas[editIndex] : '';
@@ -1123,20 +1311,23 @@
         if (editIndex !== null) db.salas[editIndex] = name.trim();
         else db.salas.push(name.trim());
         saveDB();
-        openConfig();
+        switchTab(3);
       }
     }
+
 
     function deleteSala(index) {
       if (confirm(`¿Eliminar la sala "${db.salas[index]}"?`)) {
         db.salas.splice(index, 1);
         saveDB();
-        openConfig();
+        switchTab(3);
       }
     }
 
+
     function renderEmployees(container) {
       const dayLabels = { 'L': 'Lun', 'M': 'Mar', 'X': 'Mié', 'J': 'Jue', 'V': 'Vie', 'S': 'Sáb', 'D': 'Dom' };
+
 
       let hoursMap = {};
       db.empleados.forEach(e => hoursMap[e.id] = 0);
@@ -1158,10 +1349,12 @@
         }
       });
 
+
       let html = `<div class="config-container">`;
 
+
       if (db.empleados.length === 0) {
-        html += `<div style="text-align:center; padding:20px; font-size:14px; color:#555;">No hay volanteros registrados. Presiona el botón "+" abajo a la derecha para agregar uno.</div>`;
+        html += `<div style="text-align:center; padding:20px; font-size:14px; color:#555;">No hay volanteros registrados. Presiona el botón "+" abajo para agregar uno.</div>`;
       } else {
         db.empleados.forEach((emp, empIdx) => {
           const totalHours = hoursMap[emp.id] || 0;
@@ -1179,6 +1372,7 @@
               </div>
           `;
 
+
           if (emp.restricciones && emp.restricciones.length > 0) {
             html += `<div style="margin-top:6px;">`;
             emp.restricciones.forEach((r, rIdx) => {
@@ -1189,53 +1383,71 @@
               html += `
                 <div class="restriction-pill">
                   <span>🚫 ${label} (${r.desde} - ${r.hasta} hs)</span>
-                  <span style="color:red; cursor:pointer; font-weight:bold; margin-left:8px;" onclick="deleteRestriccion(${empIdx}, ${rIdx})">×</span>
+                  <div>
+                    <span class="btn-edit-icon" onclick="editRestriccion(${empIdx}, ${rIdx})">✏️</span>
+                    <span style="color:red; cursor:pointer; font-weight:bold; margin-left:6px;" onclick="deleteRestriccion(${empIdx}, ${rIdx})">×</span>
+                  </div>
                 </div>
               `;
             });
             html += `</div>`;
           }
 
+
           html += `</div>`;
         });
       }
 
+
+      html += `</div>`;
+
+
+      /* BARRA INFERIOR DE ACCIONES FIJAS (NO SE DESPLAZA CON EL SCROLL) */
       html += `
+        <div class="emp-actions-bar">
+          <button class="btn-restr-fixed" onclick="openAddRestriccion()">+ Restricción</button>
+          <button class="btn-add-fixed" onclick="openFormEmpleado()">+</button>
         </div>
-        <button class="btn-restr-floating" onclick="openAddRestriccion()">+ Restricción</button>
-        <button class="btn-add-floating" onclick="openFormEmpleado()">+</button>
       `;
+
 
       container.innerHTML = html;
     }
+
 
     function openFormEmpleado(editIndex = null) {
       const panel = document.getElementById('content-panel');
       document.getElementById('menu-title').innerText = editIndex !== null ? "Editar Volantero" : "Nuevo Volantero";
 
+
       const emp = editIndex !== null ? db.empleados[editIndex] : {
         nombre: "", precioHora: 2500, color: "#b7e4c7", restricciones: []
       };
 
+
       panel.innerHTML = `
         <div class="config-card" style="padding: 12px; background:#fff;">
           <div class="card-header-blue" style="margin: -12px -12px 12px -12px;">Volantero</div>
+
 
           <div class="form-group">
             <label>Nombre:</label>
             <input type="text" id="emp_nombre" value="${emp.nombre}" placeholder="Ej. ELI">
           </div>
 
+
           <div class="form-group">
             <label>Precio por hora ($):</label>
             <input type="number" id="emp_precio" value="${emp.precioHora}">
           </div>
+
 
           <div class="form-group">
             <label>Color distintivo:</label>
             <input type="color" id="emp_color" value="${emp.color}" style="height:35px; cursor:pointer;">
           </div>
         </div>
+
 
         <div class="form-actions">
           <button class="btn-action btn-cancel" onclick="switchTab(2)">Cancelar</button>
@@ -1245,15 +1457,18 @@
       `;
     }
 
+
     function saveEmpleado(editIndex) {
       const nombre = document.getElementById('emp_nombre').value.trim();
       const precio = parseFloat(document.getElementById('emp_precio').value) || 0;
       const color = document.getElementById('emp_color').value;
 
+
       if (!nombre) {
         alert("Por favor ingresa un nombre.");
         return;
       }
+
 
       if (editIndex !== null) {
         db.empleados[editIndex].nombre = nombre;
@@ -1269,9 +1484,11 @@
         });
       }
 
+
       saveDB();
       switchTab(2);
     }
+
 
     function deleteEmpleado(index) {
       if (confirm("¿Deseas eliminar este volantero?")) {
@@ -1281,76 +1498,110 @@
       }
     }
 
-    function openAddRestriccion(empIdTarget = null) {
+
+    function openAddRestriccion(empIdTarget = null, editRestrContext = null) {
       if (db.empleados.length === 0) {
         alert("Primero debes agregar al menos un volantero.");
         return;
       }
 
-      selectedCalendarDates = [];
+
+      let existing = editRestrContext ? editRestrContext.restr : null;
+      selectedCalendarDates = (existing && existing.fecha) ? [existing.fecha] : [];
       calViewDate = new Date();
 
+
       const panel = document.getElementById('content-panel');
-      document.getElementById('menu-title').innerText = "Nueva Restricción";
+      document.getElementById('menu-title').innerText = existing ? "Editar Restricción" : "Nueva Restricción";
+
+
+      let targetEmpId = empIdTarget;
+      if (editRestrContext) {
+        targetEmpId = db.empleados[editRestrContext.empIdx].id;
+      }
+
 
       let empOptions = db.empleados.map(e => 
-        `<option value="${e.id}" ${empIdTarget === e.id ? 'selected' : ''}>${e.nombre}</option>`
+        `<option value="${e.id}" ${targetEmpId === e.id ? 'selected' : ''}>${e.nombre}</option>`
       ).join('');
+
+
+      const tipoVal = existing ? existing.tipo : 'especifico';
+      const desdeVal = existing ? existing.desde : '18:00';
+      const hastaVal = existing ? existing.hasta : '23:59';
+      const diaVal = existing && existing.dia ? existing.dia : 'D';
+
 
       panel.innerHTML = `
         <div class="config-card" style="padding: 12px; background:#fff;">
           <div class="card-header-blue" style="margin: -12px -12px 12px -12px;">Restricción de Horario</div>
+
 
           <div class="form-group">
             <label>Volantero:</label>
             <select id="restr_emp">${empOptions}</select>
           </div>
 
+
           <div class="form-group">
             <label>Tipo:</label>
             <select id="restr_tipo" onchange="toggleRestrType()">
-              <option value="especifico">Fecha o Período en Calendario</option>
-              <option value="recursivo">Día Fijo Semanal (ej. Dom)</option>
+              <option value="especifico" ${tipoVal === 'especifico' ? 'selected' : ''}>Fecha o Período en Calendario</option>
+              <option value="recursivo" ${tipoVal === 'recursivo' ? 'selected' : ''}>Día Fijo Semanal (ej. Dom)</option>
             </select>
           </div>
 
-          <div class="form-group" id="group_dia_semana" style="display:none;">
+
+          <div class="form-group" id="group_dia_semana" style="display:${tipoVal === 'recursivo' ? 'flex' : 'none'};">
             <label>Día:</label>
             <select id="restr_dia_semana">
-              <option value="L">Lunes</option>
-              <option value="M">Martes</option>
-              <option value="X">Miércoles</option>
-              <option value="J">Jueves</option>
-              <option value="V">Viernes</option>
-              <option value="S">Sábado</option>
-              <option value="D" selected>Domingo</option>
+              <option value="L" ${diaVal === 'L' ? 'selected' : ''}>Lunes</option>
+              <option value="M" ${diaVal === 'M' ? 'selected' : ''}>Martes</option>
+              <option value="X" ${diaVal === 'X' ? 'selected' : ''}>Miércoles</option>
+              <option value="J" ${diaVal === 'J' ? 'selected' : ''}>Jueves</option>
+              <option value="V" ${diaVal === 'V' ? 'selected' : ''}>Viernes</option>
+              <option value="S" ${diaVal === 'S' ? 'selected' : ''}>Sábado</option>
+              <option value="D" ${diaVal === 'D' ? 'selected' : ''}>Domingo</option>
             </select>
           </div>
 
-          <div id="group_calendar">
+
+          <div id="group_calendar" style="display:${tipoVal === 'especifico' ? 'block' : 'none'};">
             <div style="font-weight:bold; font-size:12px; margin-top:6px;">Toca los días a bloquear:</div>
             <div class="calendar-container" id="calendar_render"></div>
           </div>
 
+
           <div class="form-group" style="margin-top:10px;">
             <label>Desde hora:</label>
-            <input type="time" id="restr_desde" value="18:00">
+            <input type="time" lang="en-GB" id="restr_desde" value="${desdeVal}">
           </div>
+
 
           <div class="form-group">
             <label>Hasta hora:</label>
-            <input type="time" id="restr_hasta" value="23:59">
+            <input type="time" lang="en-GB" id="restr_hasta" value="${hastaVal}">
           </div>
         </div>
 
+
         <div class="form-actions">
           <button class="btn-action btn-cancel" onclick="switchTab(2)">Cancelar</button>
-          <button class="btn-action btn-save" onclick="saveRestriccion()">Guardar</button>
+          <button class="btn-action btn-save" onclick="saveRestriccion(${editRestrContext ? editRestrContext.empIdx : 'null'}, ${editRestrContext ? editRestrContext.rIdx : 'null'})">Guardar</button>
         </div>
       `;
 
+
       renderFuncionCalendar();
     }
+
+
+    function editRestriccion(empIndex, restrIndex) {
+      const emp = db.empleados[empIndex];
+      if (!emp || !emp.restricciones || !emp.restricciones[restrIndex]) return;
+      openAddRestriccion(emp.id, { empIdx: empIndex, rIdx: restrIndex, restr: emp.restricciones[restrIndex] });
+    }
+
 
     function toggleRestrType() {
       const tipo = document.getElementById('restr_tipo').value;
@@ -1358,16 +1609,25 @@
       document.getElementById('group_calendar').style.display = tipo === 'especifico' ? 'block' : 'none';
     }
 
-    function saveRestriccion() {
+
+    function saveRestriccion(editEmpIdx = null, editRestrIdx = null) {
       const empId = parseInt(document.getElementById('restr_emp').value);
       const tipo = document.getElementById('restr_tipo').value;
       const desde = document.getElementById('restr_desde').value;
       const hasta = document.getElementById('restr_hasta').value;
 
+
+      if (editEmpIdx !== null && editRestrIdx !== null && db.empleados[editEmpIdx]) {
+        db.empleados[editEmpIdx].restricciones.splice(editRestrIdx, 1);
+      }
+
+
       const emp = db.empleados.find(e => e.id === empId);
       if (!emp) return;
 
+
       if (!emp.restricciones) emp.restricciones = [];
+
 
       if (tipo === 'recursivo') {
         const dia = document.getElementById('restr_dia_semana').value;
@@ -1382,9 +1642,11 @@
         });
       }
 
+
       saveDB();
       switchTab(2);
     }
+
 
     function deleteRestriccion(empIndex, restrIndex) {
       if (confirm("¿Eliminar esta restricción?")) {
@@ -1393,6 +1655,7 @@
         switchTab(2);
       }
     }
+
 
     function dateKey(date) {
       return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
@@ -1411,6 +1674,7 @@
       return `${dayName} ${dayNum}/${monthNum}`;
     }
 
+
     function minutesFromTime(value) {
       if (!value || !/^\d{2}:\d{2}$/.test(value)) return null;
       const [h,m]=value.split(':').map(Number); return h*60+m;
@@ -1419,6 +1683,7 @@
       const n = ((total%1440)+1440)%1440;
       return `${String(Math.floor(n/60)).padStart(2,'0')}:${String(n%60).padStart(2,'0')}`;
     }
+
 
     function getFunctionsForDate(key) {
       let fns = db.funciones.filter(fn => fn.fechas && fn.fechas.includes(key)).map(fn => {
@@ -1432,37 +1697,47 @@
           sortMinutes += 1440;
         }
 
+
         return {...fn, _start: start, _end: end, _sortMinutes: sortMinutes ?? 0};
       });
+
 
       fns.sort((a, b) => a._sortMinutes - b._sortMinutes);
       return fns;
     }
 
+
     function employeeHasRestriction(empId, dateKeyStr, slotMinutes) {
       const emp = db.empleados.find(e => String(e.id) === String(empId));
       if (!emp || !emp.restricciones) return false;
 
+
       const dateObj = parseDateKey(dateKeyStr);
       const dayMap = {0:'D',1:'L',2:'M',3:'X',4:'J',5:'V',6:'S'};
       const weekDayCode = dayMap[dateObj.getDay()];
+
 
       return emp.restricciones.some(r => {
         const rDesde = minutesFromTime(r.desde) ?? 0;
         let rHasta = minutesFromTime(r.hasta) ?? 1439;
         if (rHasta <= rDesde) rHasta += 1440;
 
+
         let checkMin = slotMinutes;
         if (checkMin < rDesde && checkMin < 300) checkMin += 1440;
 
+
         const matchesTime = checkMin >= rDesde && checkMin <= rHasta;
+
 
         if (r.tipo === 'recursivo' && r.dia === weekDayCode && matchesTime) return true;
         if (r.tipo === 'especifico' && r.fecha === dateKeyStr && matchesTime) return true;
 
+
         return false;
       });
     }
+
 
     function employeeAssignedInOtherSala(empId, dateKeyStr, currentSala, slotMinutes) {
       if (!empId) return false;
@@ -1484,12 +1759,14 @@
       return false;
     }
 
+
     function isPlanCompleteForSala(dateKeyStr, salaName) {
       const fns = getFunctionsForDate(dateKeyStr).filter(f => f.sala === salaName);
       const planKey = `${dateKeyStr}_${salaName}`;
       const plan = db.planificaciones[planKey];
       if (!fns.length) return false;
       if (!plan || !plan.filas || !plan.filas.length) return false;
+
 
       let allSlots = [];
       fns.forEach(fn => {
@@ -1498,7 +1775,9 @@
         }
       });
 
+
       const required = fns[0].volanteros || 3;
+
 
       for (let t of allSlots) {
         let count = 0;
@@ -1514,13 +1793,16 @@
       return true;
     }
 
+
     function getDayColorStatus(key) {
       const fns = getFunctionsForDate(key);
       if (!fns.length) return "";
 
+
       const salasInDay = [...new Set(fns.map(f => f.sala))];
       let allComplete = true;
       let hasAnyPlan = false;
+
 
       for (let s of salasInDay) {
         const planKey = `${key}_${s}`;
@@ -1535,9 +1817,11 @@
         }
       }
 
+
       if (!hasAnyPlan) return "plan-incomplete";
       return allComplete ? "plan-complete" : "plan-incomplete";
     }
+
 
     function ensurePlanForSala(dateKeyStr, salaName) {
       const planKey = `${dateKeyStr}_${salaName}`;
@@ -1546,6 +1830,7 @@
         const fns = getFunctionsForDate(dateKeyStr).filter(f => f.sala === salaName);
         let defaultStart = 19*60+45;
         let defaultEnd = 24*60; 
+
 
         if (fns.length > 0) {
           const starts = fns.map(f => f._start);
@@ -1571,12 +1856,14 @@
       return plan;
     }
 
+
     function renderPlanning(container) {
       db.funciones.forEach(fn => {
         if (Array.isArray(fn.fechas)) {
           fn.fechas.forEach(fStr => ensurePlanForSala(fStr, fn.sala));
         }
       });
+
 
       const months=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
       const y=planCalViewDate.getFullYear(), m=planCalViewDate.getMonth();
@@ -1599,6 +1886,7 @@
             <div class="cal-day-label" onclick="togglePlanColumn(6, ${y}, ${m})">S</div>
             <div class="cal-day-label" onclick="togglePlanColumn(0, ${y}, ${m})">D</div>`;
 
+
       for(let i=0;i<offset;i++) html+='<div class="cal-day-cell empty"></div>';
       
       for(let d=1;d<=count;d++){
@@ -1614,8 +1902,10 @@
           statusClass += " today-cell";
         }
 
+
         html+=`<div class="cal-day-cell ${statusClass}" onclick="togglePlanDate('${key}')">${d}</div>`;
       }
+
 
       html+=`</div>
         <div class="cal-shortcuts">
@@ -1624,6 +1914,7 @@
           <button class="cal-btn-mini" onclick="planSelectedDates=[];renderPlanning(document.getElementById('content-panel'))">Limpiar</button>
         </div>
       </div>`;
+
 
       html += `
         <div style="display:flex; justify-content:space-between; align-items:center; margin:16px 0 8px 0;">
@@ -1635,15 +1926,22 @@
         </div>
       `;
 
+
       const visibleDates = [...planSelectedDates].sort();
+
 
       if(!visibleDates.length) {
         html+=`<div style="font-size:12px;color:#64748b;padding:10px 0;">No hay días seleccionados para mostrar.</div>`;
       } else {
         visibleDates.forEach(dateStr => {
-          const fns = getFunctionsForDate(dateStr);
-          if (!fns.length) return;
-          const salasInDay = [...new Set(fns.map(f => f.sala))];
+          let fns = getFunctionsForDate(dateStr);
+          let salasInDay = [...new Set(fns.map(f => f.sala))];
+
+
+          if (salasInDay.length === 0) {
+            salasInDay = [db.salas[0] || 'Cortazar'];
+          }
+
 
           salasInDay.forEach(salaName => {
             const planKey = `${dateStr}_${salaName}`;
@@ -1654,8 +1952,10 @@
         });
       }
 
+
       container.innerHTML=html;
     }
+
 
     function clearVisiblePlans() {
       if(!confirm("¿Borrar las planificaciones de los días visibles?")) return;
@@ -1669,6 +1969,7 @@
       renderPlanning(document.getElementById('content-panel'));
     }
 
+
     function togglePlanColumn(targetDayIndex, year, month) {
       const daysInMonth = new Date(year, month + 1, 0).getDate();
       const monthDates = [];
@@ -1676,11 +1977,10 @@
         const dateObj = new Date(year, month, d);
         if (dateObj.getDay() === targetDayIndex) {
           const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-          if (getFunctionsForDate(dateStr).length > 0) {
-            monthDates.push(dateStr);
-          }
+          monthDates.push(dateStr);
         }
       }
+
 
       const allSelected = monthDates.every(d => planSelectedDates.includes(d));
       if (allSelected) {
@@ -1695,31 +1995,38 @@
       renderPlanning(document.getElementById('content-panel'));
     }
 
+
     function changePlanMonth(delta) {
       planCalViewDate=new Date(planCalViewDate.getFullYear(),planCalViewDate.getMonth()+delta,1);
       renderPlanning(document.getElementById('content-panel'));
     }
 
+
     function togglePlanDate(key) {
-      if (getFunctionsForDate(key).length === 0) return;
       const i=planSelectedDates.indexOf(key);
       if(i>=0) planSelectedDates.splice(i,1); 
       else {
         planSelectedDates.push(key);
         const fns = getFunctionsForDate(key);
-        [...new Set(fns.map(f => f.sala))].forEach(s => ensurePlanForSala(key, s));
+        let salas = [...new Set(fns.map(f => f.sala))];
+        if (salas.length === 0) salas = [db.salas[0] || 'Cortazar'];
+        salas.forEach(s => ensurePlanForSala(key, s));
       }
       planSelectedDates.sort();
       renderPlanning(document.getElementById('content-panel'));
     }
 
+
     function ensurePlansForSelected() {
       planSelectedDates.forEach(k => {
         const fns = getFunctionsForDate(k);
-        [...new Set(fns.map(f => f.sala))].forEach(s => ensurePlanForSala(k, s));
+        let salas = [...new Set(fns.map(f => f.sala))];
+        if (salas.length === 0) salas = [db.salas[0] || 'Cortazar'];
+        salas.forEach(s => ensurePlanForSala(k, s));
       });
       saveDB();
     }
+
 
     function selectPlanWeekends(y,m) {
       const n=new Date(y,m+1,0).getDate();
@@ -1727,7 +2034,7 @@
         const date=new Date(y,m,d);
         if([0,6].includes(date.getDay())){
           const k=dateKey(date);
-          if(getFunctionsForDate(k).length > 0 && !planSelectedDates.includes(k)) planSelectedDates.push(k);
+          if(!planSelectedDates.includes(k)) planSelectedDates.push(k);
         }
       }
       planSelectedDates.sort();
@@ -1735,16 +2042,18 @@
       renderPlanning(document.getElementById('content-panel'));
     }
 
+
     function selectPlanMonth(y,m) {
       const n=new Date(y,m+1,0).getDate();
       for(let d=1;d<=n;d++){
         const k=dateKey(new Date(y,m,d));
-        if(getFunctionsForDate(k).length > 0 && !planSelectedDates.includes(k)) planSelectedDates.push(k);
+        if(!planSelectedDates.includes(k)) planSelectedDates.push(k);
       }
       planSelectedDates.sort();
       ensurePlansForSelected();
       renderPlanning(document.getElementById('content-panel'));
     }
+
 
     function renderPlanCard(plan, dateStr, salaName) {
       const fns = getFunctionsForDate(dateStr).filter(f => f.sala === salaName);
@@ -1755,6 +2064,7 @@
         slots.push(t);
       }
 
+
       let html = `
         <div class="plan-day-card">
           <span class="card-close-btn" onclick="closePlanCard('${dateStr}')" title="Ocultar día">×</span>
@@ -1762,6 +2072,7 @@
             <span>📅 ${formatShortDate(dateStr)} - ${salaName}</span>
             <span style="font-weight:normal; font-size:11px; color:#475569;">${showInfo}</span>
           </div>
+
 
           <div class="matrix-toolbar">
             <div class="matrix-btn-group">
@@ -1776,6 +2087,7 @@
             </div>
           </div>
 
+
           <div class="matrix-wrapper">
             <table class="matrix-table">
               <thead>
@@ -1787,13 +2099,16 @@
       });
       html += `</tr></thead><tbody>`;
 
+
       plan.filas.forEach(row => {
         const emp = db.empleados.find(e => String(e.id) === String(row.empleadoId));
         const empColor = emp ? emp.color : '#f8f9fa';
 
+
         let empOptions = `<option value="">— Seleccionar —</option>` + db.empleados.map(e => 
           `<option value="${e.id}" ${String(row.empleadoId) === String(e.id) ? 'selected' : ''}>${e.nombre}</option>`
         ).join('');
+
 
         html += `
           <tr>
@@ -1803,16 +2118,19 @@
             </td>
         `;
 
+
         slots.forEach(t => {
           const hasRestriction = row.empleadoId ? employeeHasRestriction(row.empleadoId, dateStr, t) : false;
           const assignedOther = row.empleadoId ? employeeAssignedInOtherSala(row.empleadoId, dateStr, salaName, t) : false;
           
           let slotVal = row.slots && row.slots[String(t)] ? row.slots[String(t)] : undefined;
 
+
           let displaySymbol = '';
           let cellBg = '#fff';
           let titleTooltip = '';
           let isLocked = false;
+
 
           if (hasRestriction) {
             displaySymbol = '🚫';
@@ -1833,6 +2151,7 @@
             titleTooltip = 'Sin asignar';
           }
 
+
           html += `
             <td style="background-color: ${cellBg};" title="${titleTooltip}">
               <span class="matrix-cell-btn" onclick="cycleSlotState(event, '${dateStr}', '${salaName}', ${row.id}, ${t}, ${isLocked})">${displaySymbol}</span>
@@ -1842,11 +2161,13 @@
         html += `</tr>`;
       });
 
+
       const requiredVolunteers = fns.length ? fns[0].volanteros : 3;
       html += `
         <tr class="matrix-ok-row">
           <td style="text-align:left; padding-left:8px; background:#f1f5f9;">OK</td>
       `;
+
 
       slots.forEach(t => {
         let count = 0;
@@ -1862,7 +2183,9 @@
         html += `<td style="background-color: ${cellBg};">${count}/${requiredVolunteers}</td>`;
       });
 
+
       html += `</tr></tbody></table></div>`;
+
 
       html += `
           <div style="display: flex; justify-content: space-between; margin-top: 10px; gap:6px;">
@@ -1875,6 +2198,7 @@
       `;
       return html;
     }
+
 
     function openPlanningExport() {
       const dates = [...planSelectedDates].sort();
@@ -1920,11 +2244,12 @@
       });
     }
 
+
     function closePlanningExport() { document.getElementById('planning-export-overlay')?.remove(); }
     function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
     function exportTime(mins) {
       const n = ((mins % 1440) + 1440) % 1440;
-      if (n === 0) return '00';
+      if (n === 0) return '00:00';
       return `${String(Math.floor(n/60)).padStart(2,'0')}:${String(n%60).padStart(2,'0')}`;
     }
     function getCheckedRanges(row, plan) {
@@ -1942,7 +2267,7 @@
       return ranges;
     }
     function salaInitial(sala) { return String(sala || '').trim().charAt(0).toUpperCase(); }
-    function exportShowTime(value) { return String(value || '').replace(/:00$/, ''); }
+    function exportShowTime(value) { return String(value || ''); }
     function getExportData() {
       const dates = [...planSelectedDates].sort();
       const salaSelect = document.getElementById('export-salas');
@@ -1967,6 +2292,7 @@
       });
       return {records, allEmployees, employeeName: allEmployees ? '' : (db.empleados.find(e=>String(e.id)===String(employeeId))?.nombre || '')};
     }
+
 
     function buildPlanningText(data) {
       if (data.allEmployees) {
@@ -1994,11 +2320,13 @@
       return `${data.employeeName}\n${body.join('\n')}`;
     }
 
+
     function handlePlanningExportAction() {
       const data = getExportData();
       if (!data.records.length) { alert('No hay planificaciones para los filtros seleccionados.'); return; }
       const format = document.getElementById('export-format').value;
       const textContent = buildPlanningText(data);
+
 
       if (format === 'download-text') {
         const blob = new Blob([textContent], {type:'text/plain;charset=utf-8'});
@@ -2022,6 +2350,7 @@
       }
     }
 
+
     function fallbackCopyText(text) {
       const textArea = document.createElement("textarea");
       textArea.value = text;
@@ -2043,6 +2372,7 @@
       closePlanningExport();
     }
 
+
     /* IMAGEN MATRICIAL EXACTA TIPO EXCEL */
     function downloadMatrixImage(data) {
       if (!data.records.length) return;
@@ -2053,10 +2383,12 @@
       const dateTitle = `${formatShortDate(rec.date)} (${rec.sala})`;
       const required = fns.length ? fns[0].volanteros : 3;
 
+
       const slots = [];
       for (let t = plan.startMin; t <= plan.endMin; t += 15) {
         slots.push(t);
       }
+
 
       const colWidth = 65;
       const nameColWidth = 140;
@@ -2066,6 +2398,7 @@
       const timeHeaderH = 45;
       const totalHeight = topHeaderH + timeHeaderH + (rec.employees.length + 1) * rowHeight + 40;
 
+
       let svgContent = `
         <svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="${totalHeight}" viewBox="0 0 ${totalWidth} ${totalHeight}">
           <style>
@@ -2073,276 +2406,277 @@
             .grid-line { stroke: #cbd5e1; stroke-width: 1; }
             .bold { font-weight: 700; }
           </style>
-          <rect width="100%" height="100%" fill="#ffffff"/>
-      `;
 
-      svgContent += `
-        <rect x="10" y="10" width="${totalWidth - 20}" height="45" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
-        <text x="25" y="38" font-size="16" font-weight="800" fill="#0f172a">${escapeHtml(dateTitle)}   —   ${escapeHtml(showInfo)}   (${required} volanteros)</text>
-      `;
+      <rect width="100%" height="100%" fill="#ffffff"/>
+  `;
 
-      let startY = 10 + 45;
+  svgContent += `
+    <rect x="10" y="10" width="${totalWidth - 20}" height="45" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+    <text x="25" y="38" font-size="16" font-weight="800" fill="#0f172a">${escapeHtml(dateTitle)}   —   ${escapeHtml(showInfo)}   (${required} volanteros)</text>
+  `;
 
-      svgContent += `<rect x="10" y="${startY}" width="${nameColWidth}" height="${timeHeaderH}" fill="#f1f5f9" class="grid-line"/>`;
-      svgContent += `<text x="20" y="${startY + 27}" font-size="13" font-weight="700" fill="#334155">Horarios</text>`;
+  let startY = 10 + 45;
 
-      slots.forEach((t, i) => {
-        const cx = 10 + nameColWidth + i * colWidth;
-        svgContent += `<rect x="${cx}" y="${startY}" width="${colWidth}" height="${timeHeaderH}" fill="#f1f5f9" class="grid-line"/>`;
-        svgContent += `<text x="${cx + colWidth/2}" y="${startY + 27}" font-size="12" font-weight="700" fill="#334155" text-anchor="middle">${clockLabel(t)}</text>`;
-      });
+  svgContent += `<rect x="10" y="${startY}" width="${nameColWidth}" height="${timeHeaderH}" fill="#f1f5f9" class="grid-line"/>`;
+  svgContent += `<text x="20" y="${startY + 27}" font-size="13" font-weight="700" fill="#334155">Horarios</text>`;
 
-      startY += timeHeaderH;
+  slots.forEach((t, i) => {
+    const cx = 10 + nameColWidth + i * colWidth;
+    svgContent += `<rect x="${cx}" y="${startY}" width="${colWidth}" height="${timeHeaderH}" fill="#f1f5f9" class="grid-line"/>`;
+    svgContent += `<text x="${cx + colWidth/2}" y="${startY + 27}" font-size="12" font-weight="700" fill="#334155" text-anchor="middle">${clockLabel(t)}</text>`;
+  });
 
-      rec.employees.forEach((emp, rIdx) => {
-        const ry = startY + rIdx * rowHeight;
-        svgContent += `<rect x="10" y="${ry}" width="${nameColWidth}" height="${rowHeight}" fill="${emp.color || '#f8f9fa'}" class="grid-line"/>`;
-        svgContent += `<text x="20" y="${ry + 23}" font-size="14" font-weight="700" fill="#1e293b">${escapeHtml(emp.name)}</text>`;
+  startY += timeHeaderH;
 
-        slots.forEach((t, i) => {
-          const cx = 10 + nameColWidth + i * colWidth;
-          const isChecked = emp.slots && emp.slots[String(t)] === 'checked';
-          const cellFill = isChecked ? (emp.color || '#b7e4c7') : '#ffffff';
+  rec.employees.forEach((emp, rIdx) => {
+    const ry = startY + rIdx * rowHeight;
+    svgContent += `<rect x="10" y="${ry}" width="${nameColWidth}" height="${rowHeight}" fill="${emp.color || '#f8f9fa'}" class="grid-line"/>`;
+    svgContent += `<text x="20" y="${ry + 23}" font-size="14" font-weight="700" fill="#1e293b">${escapeHtml(emp.name)}</text>`;
 
-          svgContent += `<rect x="${cx}" y="${ry}" width="${colWidth}" height="${rowHeight}" fill="${cellFill}" class="grid-line"/>`;
-        });
-      });
+    slots.forEach((t, i) => {
+      const cx = 10 + nameColWidth + i * colWidth;
+      const isChecked = emp.slots && emp.slots[String(t)] === 'checked';
+      const cellFill = isChecked ? (emp.color || '#b7e4c7') : '#ffffff';
 
-      startY += rec.employees.length * rowHeight;
+      svgContent += `<rect x="${cx}" y="${ry}" width="${colWidth}" height="${rowHeight}" fill="${cellFill}" class="grid-line"/>`;
+    });
+  });
 
-      svgContent += `<rect x="10" y="${startY}" width="${nameColWidth}" height="${rowHeight}" fill="#f1f5f9" class="grid-line"/>`;
-      svgContent += `<text x="20" y="${startY + 23}" font-size="14" font-weight="800" fill="#0f172a">OK</text>`;
+  startY += rec.employees.length * rowHeight;
 
-      slots.forEach((t, i) => {
-        const cx = 10 + nameColWidth + i * colWidth;
-        let count = 0;
-        rec.employees.forEach(emp => {
-          if (emp.slots && emp.slots[String(t)] === 'checked') {
-            if (!employeeHasRestriction(emp.id, rec.date, t)) count++;
-          }
-        });
-        const isComplete = count >= required;
-        const okBg = isComplete ? '#b7e4c7' : '#ffadad';
+  svgContent += `<rect x="10" y="${startY}" width="${nameColWidth}" height="${rowHeight}" fill="#f1f5f9" class="grid-line"/>`;
+  svgContent += `<text x="20" y="${startY + 23}" font-size="14" font-weight="800" fill="#0f172a">OK</text>`;
 
-        svgContent += `<rect x="${cx}" y="${startY}" width="${colWidth}" height="${rowHeight}" fill="${okBg}" class="grid-line"/>`;
-        svgContent += `<text x="${cx + colWidth/2}" y="${startY + 23}" font-size="13" font-weight="800" fill="#14532d" text-anchor="middle">${count}/${required}</text>`;
-      });
+  slots.forEach((t, i) => {
+    const cx = 10 + nameColWidth + i * colWidth;
+    let count = 0;
+    rec.employees.forEach(emp => {
+      if (emp.slots && emp.slots[String(t)] === 'checked') {
+        if (!employeeHasRestriction(emp.id, rec.date, t)) count++;
+      }
+    });
+    const isComplete = count >= required;
+    const okBg = isComplete ? '#b7e4c7' : '#ffadad';
 
-      svgContent += `</svg>`;
+    svgContent += `<rect x="${cx}" y="${startY}" width="${colWidth}" height="${rowHeight}" fill="${okBg}" class="grid-line"/>`;
+    svgContent += `<text x="${cx + colWidth/2}" y="${startY + 23}" font-size="13" font-weight="800" fill="#14532d" text-anchor="middle">${count}/${required}</text>`;
+  });
 
-      const blob = new Blob([svgContent], {type: 'image/svg+xml;charset=utf-8'});
-      const url = URL.createObjectURL(blob);
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = totalWidth;
-        canvas.height = totalHeight;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        URL.revokeObjectURL(url);
-        canvas.toBlob(pngBlob => {
-          const pngUrl = URL.createObjectURL(pngBlob);
-          const a = document.createElement('a');
-          a.href = pngUrl;
-          a.download = `planificacion_${rec.date}_${rec.sala}.png`;
-          a.click();
-          URL.revokeObjectURL(pngUrl);
-        }, 'image/png');
-      };
-      img.onerror = () => {
-        URL.revokeObjectURL(url);
-        alert('No se pudo generar la imagen matricial.');
-      };
-      img.src = url;
-    }
+  svgContent += `</svg>`;
 
-    function renderDownloadsTab(container) {
-      let html = `
-        <div class="export-panel-container">
-          <div class="export-card-option">
-            <h4>📲 Descargar Aplicación Completa</h4>
-            <p>Descargá este archivo HTML actualizado con todas tus funciones, empleados y planificaciones guardadas para compartirlo o usarlo sin conexión.</p>
-            <button class="btn-big-action green" onclick="downloadFullAppHTML()">Descargar app (.html)</button>
-          </div>
-
-          <div class="export-card-option">
-            <h4>🧹 Mantenimiento</h4>
-            <p>Eliminá automáticamente de la base de datos todas las fechas de funciones pasadas hasta la fecha actual.</p>
-            <button class="btn-big-action red" onclick="cleanPastFunctions(true)">Eliminar funciones pasadas</button>
-          </div>
-
-          <div class="export-card-option">
-            <h4>📊 Exportar Planificaciones</h4>
-            <p>Seleccioná fechas en la pestaña de Calendario y utilizá el botón de descarga rápida para obtener reportes en texto o imágenes matriciales idénticas a tu formato.</p>
-            <button class="btn-big-action" onclick="switchTab(1)">Ir a Calendario</button>
-          </div>
-        </div>
-      `;
-      container.innerHTML = html;
-    }
-
-    function downloadFullAppHTML() {
-      const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
-      const blob = new Blob([htmlContent], {type: 'text/html;charset=utf-8'});
-      const url = URL.createObjectURL(blob);
+  const blob = new Blob([svgContent], {type: 'image/svg+xml;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = totalWidth;
+    canvas.height = totalHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    URL.revokeObjectURL(url);
+    canvas.toBlob(pngBlob => {
+      const pngUrl = URL.createObjectURL(pngBlob);
       const a = document.createElement('a');
-      a.href = url;
-      a.download = 'organizador_volanteo_actualizado.html';
+      a.href = pngUrl;
+      a.download = `planificacion_${rec.date}_${rec.sala}.png`;
       a.click();
-      URL.revokeObjectURL(url);
-    }
+      URL.revokeObjectURL(pngUrl);
+    }, 'image/png');
+  };
+  img.onerror = () => {
+    URL.revokeObjectURL(url);
+    alert('No se pudo generar la imagen matricial.');
+  };
+  img.src = url;
+}
 
-    function closePlanCard(key) {
-      planSelectedDates = planSelectedDates.filter(d => d !== key);
-      renderPlanning(document.getElementById('content-panel'));
-    }
+function renderDownloadsTab(container) {
+  let html = `
+    <div class="export-panel-container">
+      <div class="export-card-option">
+        <h4>📲 Descargar Aplicación Completa</h4>
+        <p>Descargá este archivo HTML actualizado con todas tus funciones, empleados y planificaciones guardadas para compartirlo o usarlo sin conexión.</p>
+        <button class="btn-big-action green" onclick="downloadFullAppHTML()">Descargar app (.html)</button>
+      </div>
 
-    function findPlan(dateStr, salaName) { 
-      return db.planificaciones[`${dateStr}_${salaName}`]; 
-    }
+      <div class="export-card-option">
+        <h4>🧹 Mantenimiento</h4>
+        <p>Eliminá automáticamente de la base de datos todas las fechas de funciones pasadas hasta la fecha actual.</p>
+        <button class="btn-big-action red" onclick="cleanPastFunctions(true)">Eliminar funciones pasadas</button>
+      </div>
 
-    function adjustPlanTime(dateStr, salaName, target, delta) {
-      const p = findPlan(dateStr, salaName);
-      if (!p) return;
-      if (target === 'start') {
-        p.startMin = Math.max(0, p.startMin + delta);
-      } else {
-        p.endMin = Math.max(p.startMin + 15, p.endMin + delta);
+      <div class="export-card-option">
+        <h4>📊 Exportar Planificaciones</h4>
+        <p>Seleccioná fechas en la pestaña de Calendario y utilizá el botón de descarga rápida para obtener reportes en texto o imágenes matriciales idénticas a tu formato.</p>
+        <button class="btn-big-action" onclick="switchTab(1)">Ir a Calendario</button>
+      </div>
+    </div>
+  `;
+  container.innerHTML = html;
+}
+
+function downloadFullAppHTML() {
+  const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+  const blob = new Blob([htmlContent], {type: 'text/html;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'organizador_volanteo_actualizado.html';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function closePlanCard(key) {
+  planSelectedDates = planSelectedDates.filter(d => d !== key);
+  renderPlanning(document.getElementById('content-panel'));
+}
+
+function findPlan(dateStr, salaName) { 
+  return db.planificaciones[`${dateStr}_${salaName}`]; 
+}
+
+function adjustPlanTime(dateStr, salaName, target, delta) {
+  const p = findPlan(dateStr, salaName);
+  if (!p) return;
+  if (target === 'start') {
+    p.startMin = Math.max(0, p.startMin + delta);
+  } else {
+    p.endMin = Math.max(p.startMin + 15, p.endMin + delta);
+  }
+  saveDB();
+  renderPlanning(document.getElementById('content-panel'));
+}
+
+function addPlanRow(dateStr, salaName) {
+  const p = findPlan(dateStr, salaName);
+  if (!p) return;
+  p.filas.push({ id: Date.now() + Math.random(), empleadoId: '', slots: {} });
+  saveDB();
+  renderPlanning(document.getElementById('content-panel'));
+}
+
+function removePlanRow(dateStr, salaName, id) {
+  const p = findPlan(dateStr, salaName);
+  if (!p) return;
+  if (p.filas.length <= 1) {
+    alert("Debe quedar al menos una fila.");
+    return;
+  }
+  p.filas = p.filas.filter(r => String(r.id) !== String(id));
+  saveDB();
+  renderPlanning(document.getElementById('content-panel'));
+}
+
+function setPlanEmployee(dateStr, salaName, id, empId) {
+  const p = findPlan(dateStr, salaName);
+  const r = p?.filas.find(row => String(row.id) === String(id));
+  if (!r) return;
+
+  r.empleadoId = empId;
+  r.slots = {}; 
+
+  if (empId) {
+    for (let t = p.startMin; t <= p.endMin; t += 15) {
+      if (!employeeHasRestriction(empId, dateStr, t) && !employeeAssignedInOtherSala(empId, dateStr, salaName, t)) {
+        r.slots[String(t)] = 'checked';
       }
-      saveDB();
-      renderPlanning(document.getElementById('content-panel'));
     }
+  }
 
-    function addPlanRow(dateStr, salaName) {
-      const p = findPlan(dateStr, salaName);
-      if (!p) return;
-      p.filas.push({ id: Date.now() + Math.random(), empleadoId: '', slots: {} });
-      saveDB();
-      renderPlanning(document.getElementById('content-panel'));
+  saveDB();
+  renderPlanning(document.getElementById('content-panel'));
+}
+
+function cycleSlotState(event, dateStr, salaName, id, t, isLocked) {
+  event.preventDefault();
+
+  if (isLocked) {
+    alert("Este horario está bloqueado por una restricción asignada en la ficha del empleado.");
+    return;
+  }
+
+  const p = findPlan(dateStr, salaName);
+  const r = p?.filas.find(row => String(row.id) === String(id));
+  if (!r || !r.empleadoId) return;
+
+  if (!r.slots) r.slots = {};
+
+  const key = String(t);
+  const hasConflict = employeeAssignedInOtherSala(r.empleadoId, dateStr, salaName, t);
+  const currentVal = r.slots[key];
+
+  if (hasConflict) {
+    r.slots[key] = 'empty';
+    clearOtherSalasSlot(dateStr, salaName, r.empleadoId, t);
+  } else if (currentVal === 'checked') {
+    r.slots[key] = 'empty';
+    clearOtherSalasSlot(dateStr, salaName, r.empleadoId, t);
+  } else {
+    r.slots[key] = 'checked';
+    setConflictInOtherSalas(dateStr, salaName, r.empleadoId, t);
+  }
+
+  saveDB();
+
+  const scrollPositions = Array.from(document.querySelectorAll('.matrix-wrapper'))
+    .map(el => ({ left: el.scrollLeft, top: el.scrollTop }));
+
+  renderPlanning(document.getElementById('content-panel'));
+
+  document.querySelectorAll('.matrix-wrapper').forEach((el, index) => {
+    if (scrollPositions[index]) {
+      el.scrollLeft = scrollPositions[index].left;
+      el.scrollTop = scrollPositions[index].top;
     }
+  });
+}
 
-    function removePlanRow(dateStr, salaName, id) {
-      const p = findPlan(dateStr, salaName);
-      if (!p) return;
-      if (p.filas.length <= 1) {
-        alert("Debe quedar al menos una fila.");
-        return;
-      }
-      p.filas = p.filas.filter(r => String(r.id) !== String(id));
-      saveDB();
-      renderPlanning(document.getElementById('content-panel'));
+function clearOtherSalasSlot(dateStr, currentSala, empId, t) {
+  const fns = getFunctionsForDate(dateStr);
+  const salasInDay = [...new Set(fns.map(f => f.sala))];
+
+  salasInDay.forEach(otherSala => {
+    if (otherSala === currentSala) return;
+    const otherPlan = db.planificaciones[`${dateStr}_${otherSala}`];
+    if (otherPlan && Array.isArray(otherPlan.filas)) {
+      otherPlan.filas.forEach(row => {
+        if (String(row.empleadoId) === String(empId)) {
+          if (!row.slots) row.slots = {};
+          row.slots[String(t)] = 'empty';
+        }
+      });
     }
+  });
+}
 
-    function setPlanEmployee(dateStr, salaName, id, empId) {
-      const p = findPlan(dateStr, salaName);
-      const r = p?.filas.find(row => String(row.id) === String(id));
-      if (!r) return;
+function setConflictInOtherSalas(dateStr, currentSala, empId, t) {
+  const fns = getFunctionsForDate(dateStr);
+  const salasInDay = [...new Set(fns.map(f => f.sala))];
 
-      r.empleadoId = empId;
-      r.slots = {}; 
-
-      if (empId) {
-        for (let t = p.startMin; t <= p.endMin; t += 15) {
-          if (!employeeHasRestriction(empId, dateStr, t) && !employeeAssignedInOtherSala(empId, dateStr, salaName, t)) {
-            r.slots[String(t)] = 'checked';
+  salasInDay.forEach(otherSala => {
+    if (otherSala === currentSala) return;
+    const otherPlan = db.planificaciones[`${dateStr}_${otherSala}`];
+    if (otherPlan && Array.isArray(otherPlan.filas)) {
+      otherPlan.filas.forEach(row => {
+        if (String(row.empleadoId) === String(empId)) {
+          if (!row.slots) row.slots = {};
+          if (row.slots[String(t)] === 'checked') {
+            row.slots[String(t)] = 'empty';
           }
         }
-      }
-
-      saveDB();
-      renderPlanning(document.getElementById('content-panel'));
-    }
-
-    function cycleSlotState(event, dateStr, salaName, id, t, isLocked) {
-      event.preventDefault();
-
-      if (isLocked) {
-        alert("Este horario está bloqueado por una restricción asignada en la ficha del empleado.");
-        return;
-      }
-
-      const p = findPlan(dateStr, salaName);
-      const r = p?.filas.find(row => String(row.id) === String(id));
-      if (!r || !r.empleadoId) return;
-
-      if (!r.slots) r.slots = {};
-
-      const key = String(t);
-      const hasConflict = employeeAssignedInOtherSala(r.empleadoId, dateStr, salaName, t);
-      const currentVal = r.slots[key];
-
-      if (hasConflict) {
-        r.slots[key] = 'empty';
-        clearOtherSalasSlot(dateStr, salaName, r.empleadoId, t);
-      } else if (currentVal === 'checked') {
-        r.slots[key] = 'empty';
-        clearOtherSalasSlot(dateStr, salaName, r.empleadoId, t);
-      } else {
-        r.slots[key] = 'checked';
-        setConflictInOtherSalas(dateStr, salaName, r.empleadoId, t);
-      }
-
-      saveDB();
-
-      const scrollPositions = Array.from(document.querySelectorAll('.matrix-wrapper'))
-        .map(el => ({ left: el.scrollLeft, top: el.scrollTop }));
-
-      renderPlanning(document.getElementById('content-panel'));
-
-      document.querySelectorAll('.matrix-wrapper').forEach((el, index) => {
-        if (scrollPositions[index]) {
-          el.scrollLeft = scrollPositions[index].left;
-          el.scrollTop = scrollPositions[index].top;
-        }
       });
     }
+  });
+}
 
-    function clearOtherSalasSlot(dateStr, currentSala, empId, t) {
-      const fns = getFunctionsForDate(dateStr);
-      const salasInDay = [...new Set(fns.map(f => f.sala))];
+function clearPlanSala(dateStr, salaName) {
+  if (!confirm(`¿Restablecer la planificación de la sala ${salaName}?`)) return;
+  delete db.planificaciones[`${dateStr}_${salaName}`];
+  saveDB();
+  renderPlanning(document.getElementById('content-panel'));
+}
 
-      salasInDay.forEach(otherSala => {
-        if (otherSala === currentSala) return;
-        const otherPlan = db.planificaciones[`${dateStr}_${otherSala}`];
-        if (otherPlan && Array.isArray(otherPlan.filas)) {
-          otherPlan.filas.forEach(row => {
-            if (String(row.empleadoId) === String(empId)) {
-              if (!row.slots) row.slots = {};
-              row.slots[String(t)] = 'empty';
-            }
-          });
-        }
-      });
-    }
-
-    function setConflictInOtherSalas(dateStr, currentSala, empId, t) {
-      const fns = getFunctionsForDate(dateStr);
-      const salasInDay = [...new Set(fns.map(f => f.sala))];
-
-      salasInDay.forEach(otherSala => {
-        if (otherSala === currentSala) return;
-        const otherPlan = db.planificaciones[`${dateStr}_${otherSala}`];
-        if (otherPlan && Array.isArray(otherPlan.filas)) {
-          otherPlan.filas.forEach(row => {
-            if (String(row.empleadoId) === String(empId)) {
-              if (!row.slots) row.slots = {};
-              if (row.slots[String(t)] === 'checked') {
-                row.slots[String(t)] = 'empty';
-              }
-            }
-          });
-        }
-      });
-    }
-
-    function clearPlanSala(dateStr, salaName) {
-      if (!confirm(`¿Restablecer la planificación de la sala ${salaName}?`)) return;
-      delete db.planificaciones[`${dateStr}_${salaName}`];
-      saveDB();
-      renderPlanning(document.getElementById('content-panel'));
-    }
-
-    window.onload = init;
+window.onload = init;
   </script>
 
 </body>
