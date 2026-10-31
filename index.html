@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-
-<html lang="es">
-<head>
+<html lang="es"><head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
@@ -759,18 +757,38 @@ body {
   <div class="app-frame">
     <!-- CABECERA -->
     <div class="header">
-      <div class="header-title" id="menu-title">Próximas funciones</div>
-      <button class="btn-settings" id="top-download-btn" onclick="openDownloadsTab()" title="Descargas">
+      <div class="header-title" id="menu-title">Descargas</div>
+      <button class="btn-settings active" id="top-download-btn" onclick="openDownloadsTab()" title="Descargas">
         <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path></svg>
       </button>
     </div>
 
 <!-- PANEL PRINCIPAL CONTENEDOR -->
-<div class="main-panel" id="content-panel"></div>
+<div class="main-panel" id="content-panel">
+    <div class="export-panel-container">
+      <div class="export-card-option">
+        <h4>📲 Descargar Aplicación Completa</h4>
+        <p>Descargá este archivo HTML actualizado con todas tus funciones, empleados y planificaciones guardadas para compartirlo o usarlo sin conexión.</p>
+        <button class="btn-big-action green" onclick="downloadFullAppHTML()">Descargar app (.html)</button>
+      </div>
+
+      <div class="export-card-option">
+        <h4>🧹 Mantenimiento</h4>
+        <p>Eliminá automáticamente de la base de datos todas las fechas de funciones pasadas hasta la fecha actual.</p>
+        <button class="btn-big-action red" onclick="cleanPastFunctions(true)">Eliminar funciones pasadas</button>
+      </div>
+
+      <div class="export-card-option">
+        <h4>📊 Exportar Planificaciones</h4>
+        <p>Seleccioná fechas en la pestaña de Calendario y utilizá el botón de descarga rápida para obtener reportes en texto o imágenes matriciales idénticas a tu formato.</p>
+        <button class="btn-big-action" onclick="switchTab(1)">Ir a Calendario</button>
+      </div>
+    </div>
+  </div>
 
 <!-- BARRA DE NAVEGACIÓN INFERIOR -->
 <div class="nav-bar">
-  <button class="nav-btn active" id="nav-0" onclick="switchTab(0)">
+  <button class="nav-btn" id="nav-0" onclick="switchTab(0)">
     <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"></path></svg>
   </button>
   <button class="nav-btn" id="nav-1" onclick="switchTab(1)">
@@ -798,14 +816,13 @@ body {
       planificaciones: {}
     };
 
-
     let currentTab = 0;
     let isDownloadsActive = false;
     let selectedCalendarDates = [];
     let calViewDate = new Date();
     let planSelectedDates = [];
     let planCalViewDate = new Date();
-
+    let editingGroupKey = null;
 
     function init() {
       const saved = localStorage.getItem('volanteo_db');
@@ -815,24 +832,51 @@ body {
       if (!db.planificaciones || typeof db.planificaciones !== 'object' || Array.isArray(db.planificaciones)) {
         db.planificaciones = {};
       }
+
+      // Normalizar funciones heredadas para separar cada fecha como item independiente
+      if (Array.isArray(db.funciones)) {
+        let normalized = [];
+        db.funciones.forEach(fn => {
+          if (Array.isArray(fn.fechas) && fn.fechas.length > 0) {
+            const gId = fn.groupId || fn.id || Date.now();
+            fn.fechas.forEach((fStr, idx) => {
+              normalized.push({
+                id: fn.id ? `${fn.id}_${idx}` : Date.now() + Math.random(),
+                groupId: gId,
+                fechas: [fStr],
+                hora: fn.hora,
+                show: fn.show,
+                sala: fn.sala,
+                volanteros: fn.volanteros,
+                volanteoDesde: fn.volanteoDesde,
+                volanteoHasta: fn.volanteoHasta,
+                exclusivo: fn.exclusivo
+              });
+            });
+          } else {
+            normalized.push(fn);
+          }
+        });
+        db.funciones = normalized;
+      }
+
       cleanPastFunctions(false);
       ensureUpcomingDefaults();
       renderCurrentTab();
     }
-
 
     function getTodayKeyStr() {
       const today = new Date();
       return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     }
 
-
     function ensureUpcomingDefaults() {
       if (!db.funciones || db.funciones.length === 0) {
         const todayKey = getTodayKeyStr();
         db.funciones = [
           {
-            id: 1,
+            id: Date.now(),
+            groupId: 1,
             fechas: [todayKey],
             hora: "20:00",
             show: db.shows[0] || "Parejas",
@@ -847,23 +891,18 @@ body {
       }
     }
 
-
     function cleanPastFunctions(userInitiated = false) {
       const todayStr = getTodayKeyStr();
       let removedCount = 0;
 
-
       if (Array.isArray(db.funciones)) {
-        db.funciones.forEach(fn => {
-          if (Array.isArray(fn.fechas)) {
-            const originalLength = fn.fechas.length;
-            fn.fechas = fn.fechas.filter(fStr => fStr >= todayStr);
-            removedCount += (originalLength - fn.fechas.length);
-          }
+        const initialLen = db.funciones.length;
+        db.funciones = db.funciones.filter(fn => {
+          const fechaFn = Array.isArray(fn.fechas) ? fn.fechas[0] : fn.fecha;
+          return fechaFn >= todayStr;
         });
-        db.funciones = db.funciones.filter(fn => fn.fechas && fn.fechas.length > 0);
+        removedCount = initialLen - db.funciones.length;
       }
-
 
       Object.keys(db.planificaciones).forEach(planKey => {
         const datePart = planKey.split('_')[0];
@@ -872,22 +911,18 @@ body {
         }
       });
 
-
       saveDB();
 
-
       if (userInitiated) {
-        alert(removedCount > 0 ? `Se eliminaron las fechas anteriores a hoy.` : 'No había funciones o fechas pasadas para eliminar.');
+        alert(removedCount > 0 ? `Se eliminaron ${removedCount} fecha(s) pasadas.` : 'No había funciones pasadas para eliminar.');
         ensureUpcomingDefaults();
         renderCurrentTab();
       }
     }
 
-
     function saveDB() {
       localStorage.setItem('volanteo_db', JSON.stringify(db));
     }
-
 
     function switchTab(idx) {
       isDownloadsActive = false;
@@ -899,7 +934,6 @@ body {
       renderCurrentTab();
     }
 
-
     function openDownloadsTab() {
       isDownloadsActive = true;
       document.getElementById('top-download-btn').classList.add('active');
@@ -907,7 +941,6 @@ body {
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
       renderDownloadsTab(document.getElementById('content-panel'));
     }
-
 
     function renderCurrentTab() {
       if (isDownloadsActive) {
@@ -917,7 +950,6 @@ body {
       const titles = ["Próximas funciones", "Calendario", "Empleados", "Configuración"];
       document.getElementById('menu-title').innerText = titles[currentTab];
 
-
       const panel = document.getElementById('content-panel');
       if (currentTab === 0) renderHome(panel);
       else if (currentTab === 1) renderPlanning(panel);
@@ -925,21 +957,17 @@ body {
       else if (currentTab === 3) renderConfigMenu();
     }
 
-
     function getFunctionMinAssigned(fn, dateKeyStr, salaName) {
       const start = minutesFromTime(fn.volanteoDesde) ?? minutesFromTime(fn.hora) - 15;
       let end = minutesFromTime(fn.volanteoHasta);
       if (end === null) end = minutesFromTime(fn.hora) + 120;
       if (end <= start) end += 1440;
 
-
       const planKey = `${dateKeyStr}_${salaName}`;
       const plan = db.planificaciones[planKey];
       if (!plan || !plan.filas || !plan.filas.length) return 0;
 
-
       let assignedSet = new Set();
-
 
       for (let t = start; t <= end; t += 15) {
         plan.filas.forEach(row => {
@@ -951,10 +979,8 @@ body {
         });
       }
 
-
       return assignedSet.size;
     }
-
 
     function renderHome(container) {
       const occurrences = generateFunctionDates();
@@ -967,7 +993,6 @@ body {
           <div>Ok</div>
         </div>
       `;
-
 
       if (occurrences.length === 0) {
         html += `<div style="text-align:center; padding: 20px; font-size:14px; color:#64748b;">No hay funciones programadas</div>`;
@@ -988,35 +1013,32 @@ body {
       container.innerHTML = html;
     }
 
-
     function generateFunctionDates() {
       const list = [];
       db.funciones.forEach(fn => {
-        if (Array.isArray(fn.fechas)) {
-          fn.fechas.forEach(fStr => {
-            const dateObj = new Date(fStr + 'T00:00:00');
-            const dayNum = String(dateObj.getDate()).padStart(2, '0');
-            const monthNum = String(dateObj.getMonth() + 1).padStart(2, '0');
-            
-            let sortMinutes = minutesFromTime(fn.hora);
-            if (sortMinutes !== null && sortMinutes >= 0 && sortMinutes <= 120) {
-              sortMinutes += 1440;
-            }
+        const fechasList = Array.isArray(fn.fechas) ? fn.fechas : (fn.fecha ? [fn.fecha] : []);
+        fechasList.forEach(fStr => {
+          const dateObj = new Date(fStr + 'T00:00:00');
+          const dayNum = String(dateObj.getDate()).padStart(2, '0');
+          const monthNum = String(dateObj.getMonth() + 1).padStart(2, '0');
+          
+          let sortMinutes = minutesFromTime(fn.hora);
+          if (sortMinutes !== null && sortMinutes >= 0 && sortMinutes <= 120) {
+            sortMinutes += 1440;
+          }
 
-
-            list.push({
-              diaStr: `${dayNum}/${monthNum}`,
-              hora: fn.hora,
-              show: fn.show,
-              sala: fn.sala,
-              volanteros: fn.volanteros,
-              fullDate: dateObj,
-              dateKeyStr: fStr,
-              _sortMinutes: sortMinutes ?? 0,
-              rawFn: fn
-            });
+          list.push({
+            diaStr: `${dayNum}/${monthNum}`,
+            hora: fn.hora,
+            show: fn.show,
+            sala: fn.sala,
+            volanteros: fn.volanteros,
+            fullDate: dateObj,
+            dateKeyStr: fStr,
+            _sortMinutes: sortMinutes ?? 0,
+            rawFn: fn
           });
-        }
+        });
       });
       
       list.sort((a, b) => {
@@ -1028,6 +1050,36 @@ body {
       return list;
     }
 
+    function getGroupedFunctions() {
+      const groups = [];
+      const map = new Map();
+
+      db.funciones.forEach((fn) => {
+        const gKey = String(fn.groupId || `${fn.show}_${fn.sala}_${fn.hora}_${fn.volanteros}`);
+        if (!map.has(gKey)) {
+          const groupItem = {
+            gKey: gKey,
+            show: fn.show,
+            sala: fn.sala,
+            hora: fn.hora,
+            volanteros: fn.volanteros,
+            volanteoDesde: fn.volanteoDesde,
+            volanteoHasta: fn.volanteoHasta,
+            exclusivo: fn.exclusivo,
+            fechas: []
+          };
+          map.set(gKey, groupItem);
+          groups.push(groupItem);
+        }
+        const groupItem = map.get(gKey);
+        const fStr = Array.isArray(fn.fechas) ? fn.fechas[0] : fn.fecha;
+        if (fStr && !groupItem.fechas.includes(fStr)) {
+          groupItem.fechas.push(fStr);
+        }
+      });
+
+      return groups;
+    }
 
     function renderConfigMenu() {
       const panel = document.getElementById('content-panel');
@@ -1038,30 +1090,29 @@ body {
             <div class="card-body">
       `;
 
+      const groupedFns = getGroupedFunctions();
 
-      db.funciones.forEach((fn, index) => {
-        const count = fn.fechas ? fn.fechas.length : 0;
+      groupedFns.forEach((grp) => {
+        const count = grp.fechas.length;
+        const labelDias = count === 1 ? "1 día" : `${count} días`;
         html += `
           <div class="list-item-funcion">
-            <span onclick="openAddFuncion(${index})" style="flex:1;"><strong>${fn.show}</strong> (${count} días)</span>
-            <span onclick="openAddFuncion(${index})" style="margin-right:8px; font-size:12px; color:#555;">[${fn.sala}] ${fn.hora}</span>
-            <span class="btn-delete-icon" onclick="deleteFuncion(${index})">×</span>
+            <span onclick="openAddFuncionByGroup('${grp.gKey}')" style="flex:1;"><strong>${grp.show}</strong> (${labelDias})</span>
+            <span onclick="openAddFuncionByGroup('${grp.gKey}')" style="margin-right:8px; font-size:12px; color:#555;">[${grp.sala}] ${grp.hora}</span>
+            <span class="btn-delete-icon" onclick="deleteFuncionGroup('${grp.gKey}')">×</span>
           </div>
         `;
       });
-
 
       html += `
             </div>
             <button class="btn-add" onclick="openAddFuncion()">+</button>
           </div>
 
-
           <div class="config-card">
             <div class="card-header-blue">Shows</div>
             <div class="card-body">
       `;
-
 
       db.shows.forEach((show, idx) => {
         html += `
@@ -1072,18 +1123,15 @@ body {
         `;
       });
 
-
       html += `
             </div>
             <button class="btn-add" onclick="openAddShow()">+</button>
           </div>
 
-
           <div class="config-card">
             <div class="card-header-blue">Salas</div>
             <div class="card-body">
       `;
-
 
       db.salas.forEach((sala, idx) => {
         html += `
@@ -1094,7 +1142,6 @@ body {
         `;
       });
 
-
       html += `
             </div>
             <button class="btn-add" onclick="openAddSala()">+</button>
@@ -1102,44 +1149,43 @@ body {
         </div>
       `;
 
-
       panel.innerHTML = html;
     }
 
+    function openAddFuncionByGroup(groupKey) {
+      const grp = getGroupedFunctions().find(g => String(g.gKey) === String(groupKey));
+      if (!grp) return;
+      openAddFuncion(grp);
+    }
 
-    function openAddFuncion(editIndex = null) {
+    function openAddFuncion(groupObj = null) {
       const panel = document.getElementById('content-panel');
-      document.getElementById('menu-title').innerText = editIndex !== null ? "Editar Función" : "Nueva Función";
+      document.getElementById('menu-title').innerText = groupObj ? "Editar Función" : "Nueva Función";
 
+      editingGroupKey = groupObj ? groupObj.gKey : null;
 
-      const fn = editIndex !== null ? db.funciones[editIndex] : {
+      const fn = groupObj ? groupObj : {
         fechas: [], hora: "21:30", show: db.shows[0] || "", sala: db.salas[0] || "",
         volanteros: 3, volanteoDesde: "19:30", volanteoHasta: "21:30", exclusivo: false
       };
 
-
       selectedCalendarDates = fn.fechas ? [...fn.fechas] : [];
       calViewDate = new Date();
 
-
       let showsOptions = db.shows.map(s => `<option value="${s}" ${s === fn.show ? 'selected' : ''}>${s}</option>`).join('');
       let salasOptions = db.salas.map(s => `<option value="${s}" ${s === fn.sala ? 'selected' : ''}>${s}</option>`).join('');
-
 
       panel.innerHTML = `
         <div class="config-card" style="padding: 12px; background:#fff;">
           <div class="card-header-blue" style="margin: -12px -12px 12px -12px;">Detalles de la Función</div>
 
-
           <div class="form-group"><label>Show:</label><select id="fn_show">${showsOptions}</select></div>
           <div class="form-group"><label>Sala:</label><select id="fn_sala">${salasOptions}</select></div>
           <div class="form-group"><label>Hora Función:</label><input type="time" lang="en-GB" id="fn_hora" value="${fn.hora}"></div>
 
-
           <div style="font-weight:bold; font-size:12px; margin-top:10px;">Selecciona los días en el calendario:</div>
           <div style="font-size:10px; color:#64748b; margin-bottom:4px;">Tip: Toca las letras arriba (L, M, X...) para marcar/desmarcar todos esos días del mes.</div>
           <div class="calendar-container" id="calendar_render"></div>
-
 
           <div class="form-group" style="margin-top:10px;"><label>Volanteros:</label><input type="number" id="fn_volanteros" value="${fn.volanteros}" style="text-align:center; font-weight:bold;"></div>
           <div class="form-group"><label>Volanteo desde:</label><input type="time" lang="en-GB" id="fn_v_desde" value="${fn.volanteoDesde}"></div>
@@ -1147,34 +1193,28 @@ body {
           <div class="form-group"><label>Exclusivo:</label><input type="checkbox" id="fn_exclusivo" ${fn.exclusivo ? 'checked' : ''} style="width:20px; height:20px;"></div>
         </div>
 
-
         <div class="form-actions">
           <button class="btn-action btn-cancel" onclick="switchTab(3)">Cancelar</button>
-          ${editIndex !== null ? `<button class="btn-action btn-delete" onclick="deleteFuncion(${editIndex})">Eliminar</button>` : ''}
-          <button class="btn-action btn-save" onclick="saveFuncion(${editIndex})">Guardar</button>
+          ${groupObj ? `<button class="btn-action btn-delete" onclick="deleteFuncionGroup('${groupObj.gKey}')">Eliminar</button>` : ''}
+          <button class="btn-action btn-save" onclick="saveFuncion()">Guardar</button>
         </div>
       `;
 
-
       renderFuncionCalendar();
     }
-
 
     function renderFuncionCalendar() {
       const container = document.getElementById('calendar_render');
       if (!container) return;
 
-
       const year = calViewDate.getFullYear();
       const month = calViewDate.getMonth();
       const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-
 
       const firstDay = new Date(year, month, 1).getDay();
       const daysInMonth = new Date(year, month + 1, 0).getDate();
       let startOffset = firstDay === 0 ? 6 : firstDay - 1;
       const todayKey = getTodayKeyStr();
-
 
       let html = `
         <div class="calendar-header">
@@ -1192,17 +1232,14 @@ body {
           <div class="cal-day-label" onclick="toggleAllWeekdaysInMonth(0, ${year}, ${month})">D</div>
       `;
 
-
       for (let i = 0; i < startOffset; i++) {
         html += `<div class="cal-day-cell empty"></div>`;
       }
-
 
       for (let d = 1; d <= daysInMonth; d++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         const isSelected = selectedCalendarDates.includes(dateStr);
         const isToday = dateStr === todayKey;
-
 
         html += `
           <div class="cal-day-cell ${isSelected ? 'selected' : ''} ${isToday ? 'today-cell' : ''}" onclick="toggleCalendarDate('${dateStr}')">
@@ -1211,11 +1248,9 @@ body {
         `;
       }
 
-
       html += `</div>`;
       container.innerHTML = html;
     }
-
 
     function toggleAllWeekdaysInMonth(targetDayIndex, year, month) {
       const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -1228,7 +1263,6 @@ body {
         }
       }
 
-
       const allSelected = monthDates.every(d => selectedCalendarDates.includes(d));
       if (allSelected) {
         selectedCalendarDates = selectedCalendarDates.filter(d => !monthDates.includes(d));
@@ -1240,12 +1274,10 @@ body {
       renderFuncionCalendar();
     }
 
-
     function changeCalMonth(delta) {
       calViewDate.setMonth(calViewDate.getMonth() + delta);
       renderFuncionCalendar();
     }
-
 
     function toggleCalendarDate(dateStr) {
       const idx = selectedCalendarDates.indexOf(dateStr);
@@ -1254,44 +1286,59 @@ body {
       renderFuncionCalendar();
     }
 
-
-    function saveFuncion(editIndex) {
+    function saveFuncion() {
       if (selectedCalendarDates.length === 0) {
         alert("Por favor selecciona al menos un día en el calendario.");
         return;
       }
 
+      const groupId = editingGroupKey || Date.now();
 
-      const newFn = {
-        id: editIndex !== null ? db.funciones[editIndex].id : Date.now(),
-        fechas: [...selectedCalendarDates],
-        hora: document.getElementById('fn_hora').value,
-        show: document.getElementById('fn_show').value,
-        sala: document.getElementById('fn_sala').value,
-        volanteros: parseInt(document.getElementById('fn_volanteros').value) || 0,
-        volanteoDesde: document.getElementById('fn_v_desde').value,
-        volanteoHasta: document.getElementById('fn_v_hasta').value,
-        exclusivo: document.getElementById('fn_exclusivo').checked
-      };
+      if (editingGroupKey) {
+        db.funciones = db.funciones.filter(fn => {
+          const k = String(fn.groupId || `${fn.show}_${fn.sala}_${fn.hora}_${fn.volanteros}`);
+          return k !== String(editingGroupKey);
+        });
+      }
 
+      const hora = document.getElementById('fn_hora').value;
+      const show = document.getElementById('fn_show').value;
+      const sala = document.getElementById('fn_sala').value;
+      const volanteros = parseInt(document.getElementById('fn_volanteros').value) || 0;
+      const volanteoDesde = document.getElementById('fn_v_desde').value;
+      const volanteoHasta = document.getElementById('fn_v_hasta').value;
+      const exclusivo = document.getElementById('fn_exclusivo').checked;
 
-      if (editIndex !== null) db.funciones[editIndex] = newFn;
-      else db.funciones.push(newFn);
+      selectedCalendarDates.forEach(fStr => {
+        db.funciones.push({
+          id: Date.now() + Math.random(),
+          groupId: groupId,
+          fechas: [fStr],
+          hora: hora,
+          show: show,
+          sala: sala,
+          volanteros: volanteros,
+          volanteoDesde: volanteoDesde,
+          volanteoHasta: volanteoHasta,
+          exclusivo: exclusivo
+        });
+      });
 
-
+      editingGroupKey = null;
       saveDB();
       switchTab(3);
     }
 
-
-    function deleteFuncion(index) {
-      if (confirm("¿Eliminar esta función?")) {
-        db.funciones.splice(index, 1);
+    function deleteFuncionGroup(groupKey) {
+      if (confirm("¿Eliminar esta función completa con todas sus fechas?")) {
+        db.funciones = db.funciones.filter(fn => {
+          const k = String(fn.groupId || `${fn.show}_${fn.sala}_${fn.hora}_${fn.volanteros}`);
+          return k !== String(groupKey);
+        });
         saveDB();
         switchTab(3);
       }
     }
-
 
     function openAddShow(editIndex = null) {
       const val = editIndex !== null ? db.shows[editIndex] : '';
@@ -1304,7 +1351,6 @@ body {
       }
     }
 
-
     function deleteShow(index) {
       if (confirm(`¿Eliminar el show "${db.shows[index]}"?`)) {
         db.shows.splice(index, 1);
@@ -1312,7 +1358,6 @@ body {
         switchTab(3);
       }
     }
-
 
     function openAddSala(editIndex = null) {
       const val = editIndex !== null ? db.salas[editIndex] : '';
@@ -1325,7 +1370,6 @@ body {
       }
     }
 
-
     function deleteSala(index) {
       if (confirm(`¿Eliminar la sala "${db.salas[index]}"?`)) {
         db.salas.splice(index, 1);
@@ -1334,10 +1378,8 @@ body {
       }
     }
 
-
     function renderEmployees(container) {
       const dayLabels = { 'L': 'Lun', 'M': 'Mar', 'X': 'Mié', 'J': 'Jue', 'V': 'Vie', 'S': 'Sáb', 'D': 'Dom' };
-
 
       let hoursMap = {};
       db.empleados.forEach(e => hoursMap[e.id] = 0);
@@ -1359,9 +1401,7 @@ body {
         }
       });
 
-
       let html = `<div class="config-container">`;
-
 
       if (db.empleados.length === 0) {
         html += `<div style="text-align:center; padding:20px; font-size:14px; color:#555;">No hay volanteros registrados. Presiona el botón "+" abajo para agregar uno.</div>`;
@@ -1381,7 +1421,6 @@ body {
                 </div>
               </div>
           `;
-
 
           if (emp.restricciones && emp.restricciones.length > 0) {
             html += `<div style="margin-top:6px;">`;
@@ -1403,16 +1442,12 @@ body {
             html += `</div>`;
           }
 
-
           html += `</div>`;
         });
       }
 
-
       html += `</div>`;
 
-
-      /* BARRA INFERIOR DE ACCIONES FIJAS (NO SE DESPLAZA CON EL SCROLL) */
       html += `
         <div class="emp-actions-bar">
           <button class="btn-restr-fixed" onclick="openAddRestriccion()">+ Restricción</button>
@@ -1420,44 +1455,36 @@ body {
         </div>
       `;
 
-
       container.innerHTML = html;
     }
-
 
     function openFormEmpleado(editIndex = null) {
       const panel = document.getElementById('content-panel');
       document.getElementById('menu-title').innerText = editIndex !== null ? "Editar Volantero" : "Nuevo Volantero";
 
-
       const emp = editIndex !== null ? db.empleados[editIndex] : {
         nombre: "", precioHora: 2500, color: "#b7e4c7", restricciones: []
       };
 
-
       panel.innerHTML = `
         <div class="config-card" style="padding: 12px; background:#fff;">
           <div class="card-header-blue" style="margin: -12px -12px 12px -12px;">Volantero</div>
-
 
           <div class="form-group">
             <label>Nombre:</label>
             <input type="text" id="emp_nombre" value="${emp.nombre}" placeholder="Ej. ELI">
           </div>
 
-
           <div class="form-group">
             <label>Precio por hora ($):</label>
             <input type="number" id="emp_precio" value="${emp.precioHora}">
           </div>
-
 
           <div class="form-group">
             <label>Color distintivo:</label>
             <input type="color" id="emp_color" value="${emp.color}" style="height:35px; cursor:pointer;">
           </div>
         </div>
-
 
         <div class="form-actions">
           <button class="btn-action btn-cancel" onclick="switchTab(2)">Cancelar</button>
@@ -1467,18 +1494,15 @@ body {
       `;
     }
 
-
     function saveEmpleado(editIndex) {
       const nombre = document.getElementById('emp_nombre').value.trim();
       const precio = parseFloat(document.getElementById('emp_precio').value) || 0;
       const color = document.getElementById('emp_color').value;
 
-
       if (!nombre) {
         alert("Por favor ingresa un nombre.");
         return;
       }
-
 
       if (editIndex !== null) {
         db.empleados[editIndex].nombre = nombre;
@@ -1494,11 +1518,9 @@ body {
         });
       }
 
-
       saveDB();
       switchTab(2);
     }
-
 
     function deleteEmpleado(index) {
       if (confirm("¿Deseas eliminar este volantero?")) {
@@ -1508,50 +1530,41 @@ body {
       }
     }
 
-
     function openAddRestriccion(empIdTarget = null, editRestrContext = null) {
       if (db.empleados.length === 0) {
         alert("Primero debes agregar al menos un volantero.");
         return;
       }
 
-
       let existing = editRestrContext ? editRestrContext.restr : null;
       selectedCalendarDates = (existing && existing.fecha) ? [existing.fecha] : [];
       calViewDate = new Date();
 
-
       const panel = document.getElementById('content-panel');
       document.getElementById('menu-title').innerText = existing ? "Editar Restricción" : "Nueva Restricción";
-
 
       let targetEmpId = empIdTarget;
       if (editRestrContext) {
         targetEmpId = db.empleados[editRestrContext.empIdx].id;
       }
 
-
       let empOptions = db.empleados.map(e => 
         `<option value="${e.id}" ${targetEmpId === e.id ? 'selected' : ''}>${e.nombre}</option>`
       ).join('');
-
 
       const tipoVal = existing ? existing.tipo : 'especifico';
       const desdeVal = existing ? existing.desde : '18:00';
       const hastaVal = existing ? existing.hasta : '23:59';
       const diaVal = existing && existing.dia ? existing.dia : 'D';
 
-
       panel.innerHTML = `
         <div class="config-card" style="padding: 12px; background:#fff;">
           <div class="card-header-blue" style="margin: -12px -12px 12px -12px;">Restricción de Horario</div>
-
 
           <div class="form-group">
             <label>Volantero:</label>
             <select id="restr_emp">${empOptions}</select>
           </div>
-
 
           <div class="form-group">
             <label>Tipo:</label>
@@ -1560,7 +1573,6 @@ body {
               <option value="recursivo" ${tipoVal === 'recursivo' ? 'selected' : ''}>Día Fijo Semanal (ej. Dom)</option>
             </select>
           </div>
-
 
           <div class="form-group" id="group_dia_semana" style="display:${tipoVal === 'recursivo' ? 'flex' : 'none'};">
             <label>Día:</label>
@@ -1575,18 +1587,15 @@ body {
             </select>
           </div>
 
-
           <div id="group_calendar" style="display:${tipoVal === 'especifico' ? 'block' : 'none'};">
             <div style="font-weight:bold; font-size:12px; margin-top:6px;">Toca los días a bloquear:</div>
             <div class="calendar-container" id="calendar_render"></div>
           </div>
 
-
           <div class="form-group" style="margin-top:10px;">
             <label>Desde hora:</label>
             <input type="time" lang="en-GB" id="restr_desde" value="${desdeVal}">
           </div>
-
 
           <div class="form-group">
             <label>Hasta hora:</label>
@@ -1594,17 +1603,14 @@ body {
           </div>
         </div>
 
-
         <div class="form-actions">
           <button class="btn-action btn-cancel" onclick="switchTab(2)">Cancelar</button>
           <button class="btn-action btn-save" onclick="saveRestriccion(${editRestrContext ? editRestrContext.empIdx : 'null'}, ${editRestrContext ? editRestrContext.rIdx : 'null'})">Guardar</button>
         </div>
       `;
 
-
       renderFuncionCalendar();
     }
-
 
     function editRestriccion(empIndex, restrIndex) {
       const emp = db.empleados[empIndex];
@@ -1612,13 +1618,11 @@ body {
       openAddRestriccion(emp.id, { empIdx: empIndex, rIdx: restrIndex, restr: emp.restricciones[restrIndex] });
     }
 
-
     function toggleRestrType() {
       const tipo = document.getElementById('restr_tipo').value;
       document.getElementById('group_dia_semana').style.display = tipo === 'recursivo' ? 'flex' : 'none';
       document.getElementById('group_calendar').style.display = tipo === 'especifico' ? 'block' : 'none';
     }
-
 
     function saveRestriccion(editEmpIdx = null, editRestrIdx = null) {
       const empId = parseInt(document.getElementById('restr_emp').value);
@@ -1626,18 +1630,14 @@ body {
       const desde = document.getElementById('restr_desde').value;
       const hasta = document.getElementById('restr_hasta').value;
 
-
       if (editEmpIdx !== null && editRestrIdx !== null && db.empleados[editEmpIdx]) {
         db.empleados[editEmpIdx].restricciones.splice(editRestrIdx, 1);
       }
 
-
       const emp = db.empleados.find(e => e.id === empId);
       if (!emp) return;
 
-
       if (!emp.restricciones) emp.restricciones = [];
-
 
       if (tipo === 'recursivo') {
         const dia = document.getElementById('restr_dia_semana').value;
@@ -1652,11 +1652,9 @@ body {
         });
       }
 
-
       saveDB();
       switchTab(2);
     }
-
 
     function deleteRestriccion(empIndex, restrIndex) {
       if (confirm("¿Eliminar esta restricción?")) {
@@ -1665,7 +1663,6 @@ body {
         switchTab(2);
       }
     }
-
 
     function dateKey(date) {
       return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
@@ -1684,7 +1681,6 @@ body {
       return `${dayName} ${dayNum}/${monthNum}`;
     }
 
-
     function minutesFromTime(value) {
       if (!value || !/^\d{2}:\d{2}$/.test(value)) return null;
       const [h,m]=value.split(':').map(Number); return h*60+m;
@@ -1694,9 +1690,11 @@ body {
       return `${String(Math.floor(n/60)).padStart(2,'0')}:${String(n%60).padStart(2,'0')}`;
     }
 
-
     function getFunctionsForDate(key) {
-      let fns = db.funciones.filter(fn => fn.fechas && fn.fechas.includes(key)).map(fn => {
+      let fns = db.funciones.filter(fn => {
+        const fechasList = Array.isArray(fn.fechas) ? fn.fechas : (fn.fecha ? [fn.fecha] : []);
+        return fechasList.includes(key);
+      }).map(fn => {
         const start = minutesFromTime(fn.volanteoDesde) ?? minutesFromTime(fn.hora) - 15;
         let end = minutesFromTime(fn.volanteoHasta);
         if (end === null) end = minutesFromTime(fn.hora) + 120;
@@ -1707,47 +1705,37 @@ body {
           sortMinutes += 1440;
         }
 
-
         return {...fn, _start: start, _end: end, _sortMinutes: sortMinutes ?? 0};
       });
-
 
       fns.sort((a, b) => a._sortMinutes - b._sortMinutes);
       return fns;
     }
 
-
     function employeeHasRestriction(empId, dateKeyStr, slotMinutes) {
       const emp = db.empleados.find(e => String(e.id) === String(empId));
       if (!emp || !emp.restricciones) return false;
 
-
       const dateObj = parseDateKey(dateKeyStr);
       const dayMap = {0:'D',1:'L',2:'M',3:'X',4:'J',5:'V',6:'S'};
       const weekDayCode = dayMap[dateObj.getDay()];
-
 
       return emp.restricciones.some(r => {
         const rDesde = minutesFromTime(r.desde) ?? 0;
         let rHasta = minutesFromTime(r.hasta) ?? 1439;
         if (rHasta <= rDesde) rHasta += 1440;
 
-
         let checkMin = slotMinutes;
         if (checkMin < rDesde && checkMin < 300) checkMin += 1440;
 
-
         const matchesTime = checkMin >= rDesde && checkMin <= rHasta;
-
 
         if (r.tipo === 'recursivo' && r.dia === weekDayCode && matchesTime) return true;
         if (r.tipo === 'especifico' && r.fecha === dateKeyStr && matchesTime) return true;
 
-
         return false;
       });
     }
-
 
     function employeeAssignedInOtherSala(empId, dateKeyStr, currentSala, slotMinutes) {
       if (!empId) return false;
@@ -1769,14 +1757,12 @@ body {
       return false;
     }
 
-
     function isPlanCompleteForSala(dateKeyStr, salaName) {
       const fns = getFunctionsForDate(dateKeyStr).filter(f => f.sala === salaName);
       const planKey = `${dateKeyStr}_${salaName}`;
       const plan = db.planificaciones[planKey];
       if (!fns.length) return false;
       if (!plan || !plan.filas || !plan.filas.length) return false;
-
 
       let allSlots = [];
       fns.forEach(fn => {
@@ -1785,9 +1771,7 @@ body {
         }
       });
 
-
       const required = fns[0].volanteros || 3;
-
 
       for (let t of allSlots) {
         let count = 0;
@@ -1803,16 +1787,13 @@ body {
       return true;
     }
 
-
     function getDayColorStatus(key) {
       const fns = getFunctionsForDate(key);
       if (!fns.length) return "";
 
-
       const salasInDay = [...new Set(fns.map(f => f.sala))];
       let allComplete = true;
       let hasAnyPlan = false;
-
 
       for (let s of salasInDay) {
         const planKey = `${key}_${s}`;
@@ -1827,11 +1808,9 @@ body {
         }
       }
 
-
       if (!hasAnyPlan) return "plan-incomplete";
       return allComplete ? "plan-complete" : "plan-incomplete";
     }
-
 
     function ensurePlanForSala(dateKeyStr, salaName) {
       const planKey = `${dateKeyStr}_${salaName}`;
@@ -1840,7 +1819,6 @@ body {
         const fns = getFunctionsForDate(dateKeyStr).filter(f => f.sala === salaName);
         let defaultStart = 19*60+45;
         let defaultEnd = 24*60; 
-
 
         if (fns.length > 0) {
           const starts = fns.map(f => f._start);
@@ -1866,14 +1844,11 @@ body {
       return plan;
     }
 
-
     function renderPlanning(container) {
       db.funciones.forEach(fn => {
-        if (Array.isArray(fn.fechas)) {
-          fn.fechas.forEach(fStr => ensurePlanForSala(fStr, fn.sala));
-        }
+        const fechasList = Array.isArray(fn.fechas) ? fn.fechas : (fn.fecha ? [fn.fecha] : []);
+        fechasList.forEach(fStr => ensurePlanForSala(fStr, fn.sala));
       });
-
 
       const months=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
       const y=planCalViewDate.getFullYear(), m=planCalViewDate.getMonth();
@@ -1896,7 +1871,6 @@ body {
             <div class="cal-day-label" onclick="togglePlanColumn(6, ${y}, ${m})">S</div>
             <div class="cal-day-label" onclick="togglePlanColumn(0, ${y}, ${m})">D</div>`;
 
-
       for(let i=0;i<offset;i++) html+='<div class="cal-day-cell empty"></div>';
       
       for(let d=1;d<=count;d++){
@@ -1912,10 +1886,8 @@ body {
           statusClass += " today-cell";
         }
 
-
         html+=`<div class="cal-day-cell ${statusClass}" onclick="togglePlanDate('${key}')">${d}</div>`;
       }
-
 
       html+=`</div>
         <div class="cal-shortcuts">
@@ -1924,7 +1896,6 @@ body {
           <button class="cal-btn-mini" onclick="planSelectedDates=[];renderPlanning(document.getElementById('content-panel'))">Limpiar</button>
         </div>
       </div>`;
-
 
       html += `
         <div style="display:flex; justify-content:space-between; align-items:center; margin:16px 0 8px 0;">
@@ -1936,9 +1907,7 @@ body {
         </div>
       `;
 
-
       const visibleDates = [...planSelectedDates].sort();
-
 
       if(!visibleDates.length) {
         html+=`<div style="font-size:12px;color:#64748b;padding:10px 0;">No hay días seleccionados para mostrar.</div>`;
@@ -1947,11 +1916,9 @@ body {
           let fns = getFunctionsForDate(dateStr);
           let salasInDay = [...new Set(fns.map(f => f.sala))];
 
-
           if (salasInDay.length === 0) {
             salasInDay = [db.salas[0] || 'Cortazar'];
           }
-
 
           salasInDay.forEach(salaName => {
             const planKey = `${dateStr}_${salaName}`;
@@ -1962,10 +1929,8 @@ body {
         });
       }
 
-
       container.innerHTML=html;
     }
-
 
     function clearVisiblePlans() {
       if(!confirm("¿Borrar las planificaciones de los días visibles?")) return;
@@ -1979,7 +1944,6 @@ body {
       renderPlanning(document.getElementById('content-panel'));
     }
 
-
     function togglePlanColumn(targetDayIndex, year, month) {
       const daysInMonth = new Date(year, month + 1, 0).getDate();
       const monthDates = [];
@@ -1990,7 +1954,6 @@ body {
           monthDates.push(dateStr);
         }
       }
-
 
       const allSelected = monthDates.every(d => planSelectedDates.includes(d));
       if (allSelected) {
@@ -2005,12 +1968,10 @@ body {
       renderPlanning(document.getElementById('content-panel'));
     }
 
-
     function changePlanMonth(delta) {
       planCalViewDate=new Date(planCalViewDate.getFullYear(),planCalViewDate.getMonth()+delta,1);
       renderPlanning(document.getElementById('content-panel'));
     }
-
 
     function togglePlanDate(key) {
       const i=planSelectedDates.indexOf(key);
@@ -2026,7 +1987,6 @@ body {
       renderPlanning(document.getElementById('content-panel'));
     }
 
-
     function ensurePlansForSelected() {
       planSelectedDates.forEach(k => {
         const fns = getFunctionsForDate(k);
@@ -2036,7 +1996,6 @@ body {
       });
       saveDB();
     }
-
 
     function selectPlanWeekends(y,m) {
       const n=new Date(y,m+1,0).getDate();
@@ -2052,7 +2011,6 @@ body {
       renderPlanning(document.getElementById('content-panel'));
     }
 
-
     function selectPlanMonth(y,m) {
       const n=new Date(y,m+1,0).getDate();
       for(let d=1;d<=n;d++){
@@ -2064,7 +2022,6 @@ body {
       renderPlanning(document.getElementById('content-panel'));
     }
 
-
     function renderPlanCard(plan, dateStr, salaName) {
       const fns = getFunctionsForDate(dateStr).filter(f => f.sala === salaName);
       const showInfo = fns.length ? fns.map(f => `${f.show} (${f.hora})`).join(', ') : 'Sin función';
@@ -2074,7 +2031,6 @@ body {
         slots.push(t);
       }
 
-
       let html = `
         <div class="plan-day-card">
           <span class="card-close-btn" onclick="closePlanCard('${dateStr}')" title="Ocultar día">×</span>
@@ -2082,7 +2038,6 @@ body {
             <span>📅 ${formatShortDate(dateStr)} - ${salaName}</span>
             <span style="font-weight:normal; font-size:11px; color:#475569;">${showInfo}</span>
           </div>
-
 
           <div class="matrix-toolbar">
             <div class="matrix-btn-group">
@@ -2097,7 +2052,6 @@ body {
             </div>
           </div>
 
-
           <div class="matrix-wrapper">
             <table class="matrix-table">
               <thead>
@@ -2109,16 +2063,13 @@ body {
       });
       html += `</tr></thead><tbody>`;
 
-
       plan.filas.forEach(row => {
         const emp = db.empleados.find(e => String(e.id) === String(row.empleadoId));
         const empColor = emp ? emp.color : '#f8f9fa';
 
-
         let empOptions = `<option value="">— Seleccionar —</option>` + db.empleados.map(e => 
           `<option value="${e.id}" ${String(row.empleadoId) === String(e.id) ? 'selected' : ''}>${e.nombre}</option>`
         ).join('');
-
 
         html += `
           <tr>
@@ -2128,19 +2079,16 @@ body {
             </td>
         `;
 
-
         slots.forEach(t => {
           const hasRestriction = row.empleadoId ? employeeHasRestriction(row.empleadoId, dateStr, t) : false;
           const assignedOther = row.empleadoId ? employeeAssignedInOtherSala(row.empleadoId, dateStr, salaName, t) : false;
           
           let slotVal = row.slots && row.slots[String(t)] ? row.slots[String(t)] : undefined;
 
-
           let displaySymbol = '';
           let cellBg = '#fff';
           let titleTooltip = '';
           let isLocked = false;
-
 
           if (hasRestriction) {
             displaySymbol = '🚫';
@@ -2161,7 +2109,6 @@ body {
             titleTooltip = 'Sin asignar';
           }
 
-
           html += `
             <td style="background-color: ${cellBg};" title="${titleTooltip}">
               <span class="matrix-cell-btn" onclick="cycleSlotState(event, '${dateStr}', '${salaName}', ${row.id}, ${t}, ${isLocked})">${displaySymbol}</span>
@@ -2171,19 +2118,17 @@ body {
         html += `</tr>`;
       });
 
-
       const requiredVolunteers = fns.length ? fns[0].volanteros : 3;
       html += `
         <tr class="matrix-ok-row">
           <td style="text-align:left; padding-left:8px; background:#f1f5f9;">OK</td>
       `;
 
-
       slots.forEach(t => {
         let count = 0;
         plan.filas.forEach(row => {
           if (row.empleadoId && row.slots && row.slots[String(t)] === 'checked') {
-            if (!employeeHasRestriction(row.empleadoId, dateKeyStr, t) && !employeeAssignedInOtherSala(row.empleadoId, dateKeyStr, salaName, t)) {
+            if (!employeeHasRestriction(row.empleadoId, dateStr, t) && !employeeAssignedInOtherSala(row.empleadoId, dateStr, salaName, t)) {
               count++;
             }
           }
@@ -2193,9 +2138,7 @@ body {
         html += `<td style="background-color: ${cellBg};">${count}/${requiredVolunteers}</td>`;
       });
 
-
       html += `</tr></tbody></table></div>`;
-
 
       html += `
           <div style="display: flex; justify-content: space-between; margin-top: 10px; gap:6px;">
@@ -2208,7 +2151,6 @@ body {
       `;
       return html;
     }
-
 
     function openPlanningExport() {
       const dates = [...planSelectedDates].sort();
@@ -2253,7 +2195,6 @@ body {
         } else if ([...sel.selectedOptions].some(o => o.value !== '__ALL__') && all) all.selected = false;
       });
     }
-
 
     function closePlanningExport() { document.getElementById('planning-export-overlay')?.remove(); }
     function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -2303,7 +2244,6 @@ body {
       return {records, allEmployees, employeeName: allEmployees ? '' : (db.empleados.find(e=>String(e.id)===String(employeeId))?.nombre || '')};
     }
 
-
     function buildPlanningText(data) {
       if (data.allEmployees) {
         return data.records.map(r => {
@@ -2330,13 +2270,11 @@ body {
       return `${data.employeeName}\n${body.join('\n')}`;
     }
 
-
     function handlePlanningExportAction() {
       const data = getExportData();
       if (!data.records.length) { alert('No hay planificaciones para los filtros seleccionados.'); return; }
       const format = document.getElementById('export-format').value;
       const textContent = buildPlanningText(data);
-
 
       if (format === 'download-text') {
         const blob = new Blob([textContent], {type:'text/plain;charset=utf-8'});
@@ -2360,7 +2298,6 @@ body {
       }
     }
 
-
     function fallbackCopyText(text) {
       const textArea = document.createElement("textarea");
       textArea.value = text;
@@ -2382,8 +2319,6 @@ body {
       closePlanningExport();
     }
 
-
-    /* IMAGEN MATRICIAL EXACTA TIPO EXCEL */
     function downloadMatrixImage(data) {
       if (!data.records.length) return;
       const rec = data.records[0]; 
@@ -2393,12 +2328,10 @@ body {
       const dateTitle = `${formatShortDate(rec.date)} (${rec.sala})`;
       const required = fns.length ? fns[0].volanteros : 3;
 
-
       const slots = [];
       for (let t = plan.startMin; t <= plan.endMin; t += 15) {
         slots.push(t);
       }
-
 
       const colWidth = 65;
       const nameColWidth = 140;
@@ -2407,7 +2340,6 @@ body {
       const topHeaderH = 75;
       const timeHeaderH = 45;
       const totalHeight = topHeaderH + timeHeaderH + (rec.employees.length + 1) * rowHeight + 40;
-
 
       let svgContent = `
         <svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="${totalHeight}" viewBox="0 0 ${totalWidth} ${totalHeight}">
@@ -2689,5 +2621,4 @@ function clearPlanSala(dateStr, salaName) {
 window.onload = init;
   </script>
 
-</body>
-</html>
+</body></html>
